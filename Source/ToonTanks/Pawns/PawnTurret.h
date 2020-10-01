@@ -43,11 +43,12 @@ public:
 
 	APawnTank* PlayerPawn;
 
+	//Change override in child class: if enemy tank
+	virtual float ReturnDistanceToPlayer();
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		float FireRange = 500.0f;
-
+	
+	/**Disparo cada FireRate segundos*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 		float FireRate = 2.0f;
 
@@ -55,16 +56,21 @@ private:
 		float ScoreValue = 1;	
 
 
-	void CheckFireCondition();
+	
 
-	FTimerHandle FireRateTimerHandle;
-
-	float ReturnDistanceToPlayer();
+	
+	
+	
 
 protected:
 
-	
+	FTimerHandle FireRateTimerHandle;
 
+	void CheckFireCondition();
 
+	//float ReturnDistanceToPlayer();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+		float FireRange = 500.0f;
 	
 };

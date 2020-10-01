@@ -2,6 +2,7 @@
 
 
 #include "TankGameModeBase.h"
+#include "Toontanks/GameInstance/TankGameGameInstance.h"
 #include "ToonTanks/Pawns/PawnTank.h"
 #include "ToonTanks/Pawns/PawnTurret.h"
 #include "ToonTanks/PlayerControllers/PlayerControllerBase.h"
@@ -20,6 +21,7 @@ void ATankGameModeBase::BeginPlay()
 	// Call HandleGameStart to initialise the start countdown, turret activation, pawn check etc.
 	HandleGameStart();
 
+	LevelNames = {TEXT("Level1"), TEXT("Level2"), TEXT("Level3") };
 }
 
 
@@ -44,6 +46,8 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
 		{
 			UE_LOG(LogTemp, Error, TEXT("GM.ActorDied PlayerController not Found or none"));
 		}*/
+	
+	
 	}
 	  //If Turret, tally.
 	else if (APawnTurret* DestroyedTurret = Cast<APawnTurret>(DeadActor))
@@ -87,6 +91,9 @@ void ATankGameModeBase::HandleGameStart()
 	//En online, 0 es el controller local
 	PlayerControllerRef = Cast<APlayerControllerBase>(UGameplayStatics::GetPlayerController(this, 0));
 
+	
+
+	TankGI = Cast<UTankGameGameInstance>( GetGameInstance() );
 
 	// initialise the start countdown, turret activation, pawn check etc.
 	// Call Blueprint version GameStart();
@@ -113,18 +120,45 @@ void ATankGameModeBase::HandleGameStart()
 
 void ATankGameModeBase::HandleGameOver(bool PlayerWon)
 {
-	// See if the player has destroyed all the turrets, show win result.
-   
-    // else if turret destroyed player, show lose result. 
-   
+	// See if the player has destroyed all the turrets, show win result.   
+    // else if turret destroyed player, show lose result.    
    // Call blueprint version GameOver();
+	  //in older version
+
+	//in this version the player goes to other map
+
 	GameOver(PlayerWon);
+
+	if (!PlayerWon)
+	{
+		DelayToStart();
+		return;
+	}
+	
+
+	
 
 	if (PlayerControllerRef)
 	{
+		int32 LevelID=0;
+		if (!TankGI)
+		{
+			UE_LOG(LogTemp, Error, TEXT("GM.HandleGameOver PyerWon not Found or none"));
+			DelayToStart();
+			return;
+		}
 
+		TankGI->UpdateLevelID();
 		
-		//DelayToStart();
+
+		LevelID = TankGI->GetLevelID();
+		//UE_LOG(LogTemp, Error, TEXT("GM GameOver LevelID: %d"), LevelID);
+
+
+		//Seamlesstravel ?¿
+		UGameplayStatics::OpenLevel(GetWorld(), LevelNames[LevelID]);
+		
+		
 		
 
 		//En Delay to start
@@ -148,21 +182,29 @@ void ATankGameModeBase::HandleGameOver(bool PlayerWon)
 }
 
 
-float ATankGameModeBase::GetScore()
+int32 ATankGameModeBase::GetScore() const
 {
 	return Score;
 }
 
 
+void ATankGameModeBase::SetScore(int32 Delta)
+{
+	Score+=Delta;
+}
 
 
 //Deprecated
 void ATankGameModeBase::DelayToStart() 
 {
 	
-	
+	if(PlayerControllerRef)
 	PlayerControllerRef->SetPlayerEnabledState(false);
-
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("GM.DelayToStartw PlayerController not Found or none"));
+	}
+	
 
 
 	//Vamos a utilizar un timer delegado
@@ -172,6 +214,7 @@ void ATankGameModeBase::DelayToStart()
 	//FTimerDelegate PlayerEnableDelegate = FTimerDelegate::CreateUObject(PlayerControllerRef, &APlayerControllerBase::SetPlayerEnabledState,true);		
 	//GetWorldTimerManager().SetTimer(PlayerEnableHandle, PlayerEnableDelegate, StartDelay, false);
 
+	
 	GetWorldTimerManager().ClearTimer(PlayerEnableHandle);
 	GetWorldTimerManager().SetTimer(
 		PlayerEnableHandle,
@@ -179,7 +222,7 @@ void ATankGameModeBase::DelayToStart()
 		&ATankGameModeBase::EnableController,
 		StartDelay,
 		false,
-		0.f
+		3.f
 	);
 }
 
@@ -191,11 +234,14 @@ void ATankGameModeBase::EnableController()
 	if (PlayerControllerRef)
 	{
 		PlayerControllerRef->SetPlayerEnabledState(true);
+		PlayerControllerRef->RestartLevel();
 
+		
 
 	}
 	else
 	{
+
 		UE_LOG(LogTemp, Error, TEXT("GM.EnableContoller PlayerController not Found or none"));
 	}
 

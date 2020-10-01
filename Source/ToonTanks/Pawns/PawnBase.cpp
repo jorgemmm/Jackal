@@ -6,13 +6,16 @@
 #include "ToonTanks/Actors/ProjectileBase.h"
 #include "ToonTanks/Components/HealthComponent.h"
 
-//Engine and components
+//Engine and 
 #include "Engine/World.h"
-//#include "Engine/EngineTypes.h"
+#include "Engine/EngineTypes.h"
 #include "GameFramework/PlayerController.h"
+
+//Components
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
+#include  "ToonTanks/Components/HealthComponent.h"
 //#include "Components/PrimitiveComponent.h"
 
 //Libraries
@@ -22,6 +25,7 @@
 #include "CollisionQueryParams.h"
 #include "Particles/ParticleSystem.h"
 #include "Camera/CameraShake.h"
+
 
 
 
@@ -129,19 +133,20 @@ void APawnBase::Fire()
 	// Get ProjectileSpawnPoint Location && Rotation -> Spawn Projectile class
 	//at Location towards Rotation. 
 
-
-
 	if (ProjectileClass)
 	{
 		FVector  ProjectileSpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
 		FRotator ProjectileSpawnRotator  = ProjectileSpawnPoint->GetComponentRotation();
 
-		UE_LOG(LogTemp, Warning, TEXT("FIRE!!"));
+		//UE_LOG(LogTemp, Warning, TEXT("FIRE!!"));		
+
+		//AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotator);
+		//TempProjectile->SetOwner(this);
 		
+		Projectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotator);
+		Projectile->SetOwner(this);
 
-		AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotator);
-
-		TempProjectile->SetOwner(this);
+		
 	}
 	else
 	{
@@ -172,5 +177,71 @@ void APawnBase::HandleDestruction()
 
 	// -- PawnTank - Inform GameMode Player died -> Then Hide() all components && stop movement Input.
 
+}
+
+
+
+void APawnBase::HealingMe()
+{
+
+	UHealthComponent* HealthComp =  FindComponentByClass<UHealthComponent>();	
+	
+	HealthComp->Heal(10);
+
+}
+
+
+void APawnBase::ResetFury()
+{
+	Fury = 1;
+}
+
+void APawnBase::FuryMe()
+{
+	//Aumenta Daño armas temporal
+
+	FTimerHandle Timer_Fury;
+
+	Fury += Fury;
+
+	//if (Fury > 10) {}
+
+		if (!Projectile)
+		{
+			//Recargando Misil
+			//Fury += Fury;
+			//GetWorld()->GetTimerManager().ClearTimer(Timer_Fury);
+			return;
+		}
+		else
+		{
+			
+			Projectile->AddDamage( FMath::Clamp(Fury, 0, 100) );
+		}
+	
+
+	/*GetWorld()->GetTimerManager().ClearTimer(Timer_Fury);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		Timer_Fury,
+		this,
+		&APawnBase::ResetFury,
+		FuryDuration);
+		
+		*/
+
+	
+
+
+
+}
+
+
+
+
+//Add-Mul this value to Damage in Blueprint
+float APawnBase::GetFury()
+{
+	return Fury;
 }
 

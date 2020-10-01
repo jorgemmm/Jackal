@@ -6,7 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerController.h"
 
-
+#include  "ToonTanks/Components/HealthComponent.h"
 
 
 APawnTank::APawnTank()
@@ -44,7 +44,7 @@ void APawnTank::Tick(float DeltaTime)
 
 	FVector HitLocation = TraceHitResult.ImpactPoint;
 
-	UE_LOG(LogTemp, Warning, TEXT("FIRE!! at hole to: %s"), *HitLocation.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("FIRE!! at hole to: %s"), *HitLocation.ToString());
 
 	RotateTurret(HitLocation);
 
@@ -136,7 +136,21 @@ void APawnTank::EnableTurbo()
 	//Clear Timer To EanbleTurbo
 }
 
+int32 APawnTank::GetMissingInAction() const
+{
+	return MissingInActions;
+}
 
+void APawnTank::SetMissingInAction(int32 NewRescued)
+{
+	MissingInActions += NewRescued;
+}
+
+
+int32 APawnTank::GetMaxPassenger() const
+{
+	return MaxPassenger;
+}
 
 
 
@@ -153,4 +167,6 @@ void APawnTank::HandleDestruction()
 	SetActorTickEnabled(false);
 
 }
+
+
 

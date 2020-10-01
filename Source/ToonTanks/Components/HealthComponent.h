@@ -37,5 +37,8 @@ public:
 
 	ATankGameModeBase* GameModeRef;
 
+	UFUNCTION(BlueprintCallable)
+	void Heal(  float Delta);
+
 		
 };

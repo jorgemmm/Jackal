@@ -61,9 +61,15 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float MoveSpeed = 100.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))	
 	float RotateSpeed = 100.0f;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MissingInAction", meta = (AllowPrivateAccess = "true"))
+		int32 MissingInActions;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MissingInAction", meta = (AllowPrivateAccess = "true"))
+		int32 MaxPassenger=10;
 
 	FVector MoveDirection;
 	FQuat RotationDirection;
@@ -88,7 +94,19 @@ private:
 
 protected:
 
+public:
+
+	UFUNCTION(BlueprintPure)
+		int32 GetMissingInAction() const;
+
 	
+
+	UFUNCTION(BlueprintCallable)
+		void SetMissingInAction(int32 NewRescued);
+
+	
+	UFUNCTION(BlueprintPure)
+		int32 GetMaxPassenger() const;
 
 	
 	

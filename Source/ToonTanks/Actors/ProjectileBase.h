@@ -30,6 +30,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
@@ -39,35 +41,38 @@ private:
 	UParticleSystemComponent* ParticleTrail;
 	
 
-	/*UPROPERTY(EditDefaultsOnly, Category = "Damage", meta = (AllowPrivateAccess = "true"))
-	UClass* PointerToDamageClass;
-	To compare to TSubclassOf<T> for educational purpose
-	*/	
-	UPROPERTY(EditDefaultsOnly, Category = "Damage", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Projec_Movement", meta = (AllowPrivateAccess = "true"))
+	float MovementSpeed=1300.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Projec_Damage", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UDamageType> DamageType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float MovementSpeed = 1300.0f;
-	/*Daño Puntual o individual*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
-	float PointDamage = 20.0f;
-	/*Daño radial*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
-		float RadialDamage = 5.0f;
+	
+	/*Daño base Puntual o individual y 1/4 del radial */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projec_Damage", meta = (AllowPrivateAccess = "true"))
+	float BaseDamage = 20.f;
 	/*Radio de la explosión alcance del daño radial*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
-		float RadialRange = 25.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projec_Damage", meta = (AllowPrivateAccess = "true"))
+	float RadialRange = 25.0f;
+
+	
+	/*Daño Puntual*/
+	UPROPERTY()
+	float PointDamage;
+
+	/*Daño radial*/	
+	UPROPERTY()
+	float RadialDamage;	
 	
 	// EFFECTS
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projec_Effects", meta = (AllowPrivateAccess = "true"))
 		UParticleSystem* HitParticle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projec_Effects", meta = (AllowPrivateAccess = "true"))
 		USoundBase* HitSound;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projec_Effects", meta = (AllowPrivateAccess = "true"))
 		USoundBase* LaunchSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projec_Effects", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UCameraShake>  HitShake;
 
 
@@ -76,6 +81,15 @@ private:
 
 
 protected:
-	
+
+
+public:
+
+	UFUNCTION(BlueprintCallable)
+		void AddDamage(float Multipier);
+
+	UFUNCTION(BlueprintPure)
+		float GetPointDamage() const;
+
 
 };

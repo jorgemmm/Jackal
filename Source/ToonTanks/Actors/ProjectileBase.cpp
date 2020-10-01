@@ -37,6 +37,8 @@ AProjectileBase::AProjectileBase()
 
 	InitialLifeSpan = 3.0f;
 
+	PointDamage = BaseDamage;
+	RadialDamage = BaseDamage / 4;
 
 }
 
@@ -68,7 +70,9 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 	if (OtherActor != NULL && OtherActor != this && OtherActor != MyOwner)
 	{
-		//Dannage
+
+		UE_LOG(LogTemp, Warning, TEXT("FIRE!! PointDamage: %f"), PointDamage);
+		//Damage
 		UGameplayStatics::ApplyDamage(
 			OtherActor, 
 			PointDamage,
@@ -76,7 +80,7 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 			this, 
 			DamageType
 		);
-
+		UE_LOG(LogTemp, Warning, TEXT("FIRE!! RadialDamage: %f"), RadialDamage);
 		UGameplayStatics::ApplyRadialDamage(
 			OtherActor,
 			RadialDamage,
@@ -121,6 +125,20 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 	//Destroy proyectile after Hit
 	Destroy(); 
 }
+
+void AProjectileBase::AddDamage(float Multipier)
+{
+	PointDamage = BaseDamage* Multipier;
+	RadialDamage =  (BaseDamage / 4)*Multipier;
+}
+
+
+float AProjectileBase::GetPointDamage() const
+{
+	return PointDamage;
+}
+
+
 
 
 

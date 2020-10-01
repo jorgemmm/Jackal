@@ -7,6 +7,8 @@
 #include "Engine/World.h"
 #include "PawnTank.h"
 
+#include "Engine/EngineTypes.h"
+
 APawnTurret::APawnTurret()
 {
 	
@@ -81,7 +83,8 @@ float APawnTurret::ReturnDistanceToPlayer()
 		return 0.0f;
 	}
 
-	float Distance = (PlayerPawn->GetActorLocation() - GetActorLocation()).Size();
+	float Distance = (  PlayerPawn->GetActorLocation() - GetActorLocation()  ).Size();
+	
 	return Distance;
 
 }
