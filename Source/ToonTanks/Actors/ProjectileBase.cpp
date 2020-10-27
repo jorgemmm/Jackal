@@ -38,6 +38,7 @@ AProjectileBase::AProjectileBase()
 	InitialLifeSpan = 3.0f;
 
 	PointDamage = BaseDamage;
+
 	RadialDamage = BaseDamage / 4;
 
 }
@@ -46,6 +47,8 @@ AProjectileBase::AProjectileBase()
 void AProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
 	
 	UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());
 
@@ -62,6 +65,11 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 		return;
 	}
 
+
+	PointDamage =  BaseDamage;
+	RadialDamage = BaseDamage / 4;
+
+
 	// If the OtherActors isn't self or owner && exists, then apply damage.
 	//And Particle system
 	TArray<AActor*> IgnorethisActors;// [] = { this , MyOwner };
@@ -73,13 +81,16 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 		UE_LOG(LogTemp, Warning, TEXT("FIRE!! PointDamage: %f"), PointDamage);
 		//Damage
+
 		UGameplayStatics::ApplyDamage(
 			OtherActor, 
-			PointDamage,
+			PointDamage,			
 			MyOwner->GetInstigatorController(), 
 			this, 
 			DamageType
 		);
+
+
 		UE_LOG(LogTemp, Warning, TEXT("FIRE!! RadialDamage: %f"), RadialDamage);
 		UGameplayStatics::ApplyRadialDamage(
 			OtherActor,
@@ -89,11 +100,12 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 			DamageType,
 			IgnorethisActors,
 			this,
+			
 			MyOwner->GetInstigatorController()		
 			
 		);
 
-		DrawDebugSphere(GetWorld(), Hit.ImpactPoint , 20.f, 8.f, FColor::Yellow,false,3.0f,0,1.0f);
+		//DrawDebugSphere(GetWorld(), Hit.ImpactPoint , 20.f, 8.f, FColor::Yellow,false,3.0f,0,1.0f);
 
 		
 		//ProjectileMesh->AddForce(this->GetVelocity() * 100);
@@ -128,8 +140,8 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 void AProjectileBase::AddDamage(float Multipier)
 {
-	PointDamage = BaseDamage* Multipier;
-	RadialDamage =  (BaseDamage / 4)*Multipier;
+	PointDamage = BaseDamage* Multipier* Multipier;	
+	RadialDamage =  (BaseDamage / 4)* Multipier;
 }
 
 
@@ -139,6 +151,10 @@ float AProjectileBase::GetPointDamage() const
 }
 
 
+float AProjectileBase::GetRadialDamage() const
+{
+	return RadialDamage;
+}
 
 
 

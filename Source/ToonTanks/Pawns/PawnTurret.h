@@ -10,7 +10,11 @@
 #include "PawnTurret.generated.h"
 
 /**
- * 
+
+Esta es la clase base de los enemigos
+Sino heredan de  esta clase no funcionará bien el Game Mode
+
+ *
  */
 
 class APawnTank;

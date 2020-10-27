@@ -9,7 +9,10 @@
 #include "PawnTank.generated.h"
 
 /**
- * 
+ 
+Esta es la clase base de los players
+Sino heredan de  esta clase no funcionará bien el Game Mode
+
  
  */
 
@@ -80,6 +83,9 @@ private:
 	
 	bool bAlive = true;
 
+	/**Indica si estamos en zona de recate*/
+	bool bIsInZoneRescue = false;
+
 	void CalculateMoveInput(float Value);
 	void CalculateRotateInput(float Value);
 
@@ -91,6 +97,16 @@ private:
 	bool IsTurboEnable;	
 	void EnableTurbo();
 
+	//Variables
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AProjectileBase> ProjectileClassLv2;
+
+	//Variables
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AProjectileBase> ProjectileClassLv3;
+
+
+	virtual void Fire() override;
 
 protected:
 
@@ -104,10 +120,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SetMissingInAction(int32 NewRescued);
 
+
+
 	
 	UFUNCTION(BlueprintPure)
 		int32 GetMaxPassenger() const;
+	
+	/**Indica si estamos en zona de recate*/
+	UFUNCTION(BlueprintPure)
+		bool GetIsInZoneRescue() const;
 
-	
-	
+	UFUNCTION(BlueprintCallable)
+		void SetIsInZoneRescue();
+
+	UFUNCTION(BlueprintCallable)
+		void ResetIsInZoneRescue();
+
 };

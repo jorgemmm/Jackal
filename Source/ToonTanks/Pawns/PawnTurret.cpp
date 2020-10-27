@@ -36,7 +36,7 @@ void APawnTurret::BeginPlay()
 		);
 	}
 
-
+	
 
 }
 
@@ -57,6 +57,8 @@ void APawnTurret::Tick(float DeltaTime)
 void APawnTurret::CheckFireCondition()
 {
 	//if Player == Null || Is Dead Then BAIL!!
+	UE_LOG(LogTemp, Warning, TEXT("Soy: %s y mi Firerate es: %f"), *GetName(), FireRate);
+	
 
 	if (!PlayerPawn || !PlayerPawn->GetPlayerAlive())
 	{

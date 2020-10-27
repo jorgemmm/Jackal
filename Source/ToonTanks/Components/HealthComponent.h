@@ -25,20 +25,29 @@ protected:
 	void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Damage", meta = (AllowPrivateAccess = "true"))
+		float Health = 0.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Damage", meta = (AllowPrivateAccess = "true"))
+		bool bIsDamaged = false;
 public:	
 	
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	float DefaultHealth = 100.0f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Damage")
-	float Health = 0.0f;
+	
+	
 
 	AActor* Owner;
 
 	ATankGameModeBase* GameModeRef;
 
 	UFUNCTION(BlueprintCallable)
-	void Heal(  float Delta);
+	void Heal(  float Delta=10);
 
-		
+	UFUNCTION(BlueprintPure)
+		float GetHealth() const;
+
+	UFUNCTION(BlueprintPure)
+		bool GetbIsDamaged() const;
 };

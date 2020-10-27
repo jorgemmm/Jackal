@@ -29,6 +29,9 @@ protected:
 private:
 
 	int32 TargetTurrets = 0;
+	int32 MissinInActions = 0;
+	int32 MissingRequired;
+
 	APlayerControllerBase* PlayerControllerRef;
 
 
@@ -39,13 +42,16 @@ private:
 		int StartDelay = 3;
 
 
-	int32 GetTargetTurretCount();
+	
+
 	void HandleGameStart();
 	void HandleGameOver(bool PlayerWon);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
 	TArray<FName> LevelNames;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
+	TArray<int32> MissingInActionsByLevel;
 	
 	void DelayToStart();//Deprecated
 	void EnableController();//Deprecated
@@ -68,9 +74,18 @@ public:
 
 	
 	UFUNCTION(BlueprintPure)
+	int32 GetTargetTurretCount() const;
+
+	UFUNCTION(BlueprintPure)
 	int32 GetScore() const;
 
-	
+	UFUNCTION(BlueprintPure)
+		int32 GetMissingRequired() const;
+
+	UFUNCTION(BlueprintCallable)
+		void SetMissingRequired();
+
+
 	UFUNCTION(BlueprintCallable)
 	void SetScore(int32 Delta);
 	

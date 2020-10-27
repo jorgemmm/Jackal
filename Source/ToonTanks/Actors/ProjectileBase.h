@@ -35,8 +35,10 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ProjectileMesh;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UParticleSystemComponent* ParticleTrail;
 	
@@ -86,10 +88,11 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable)
-		void AddDamage(float Multipier);
+		void AddDamage(float Multipier=2);
 
 	UFUNCTION(BlueprintPure)
 		float GetPointDamage() const;
 
-
+	UFUNCTION(BlueprintPure)
+		float GetRadialDamage() const;
 };

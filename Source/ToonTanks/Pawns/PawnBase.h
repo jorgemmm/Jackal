@@ -7,6 +7,13 @@
 
 #include "PawnBase.generated.h"
 
+/**
+
+Esta es la clase base de todos Los pawns
+Comportasmientos y características comunes a Enemigos, Players y PNJs
+
+
+ */
 
 class UCapsuleComponent;
 class UStaticMeshComponent;
@@ -14,6 +21,7 @@ class USceneComponent;
 class AProjectileBase;
 class UHealthComponent;
 class UParticleSystem;
+class UParticleSystemComponent;
 class USoundBase;
 class UCameraShake;
 
@@ -55,26 +63,39 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* BaseMesh;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* TurretMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	USceneComponent* ProjectileSpawnPoint;
+	
+	
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent;
 	
-	//Variables
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<AProjectileBase> ProjectileClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
-	AProjectileBase* Projectile;
+
+
+	UParticleSystemComponent* Particle;
 
 protected:
+	
+	//Variables
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AProjectileBase> ProjectileClass;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
+		AProjectileBase* Projectile;*/
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* ProjectileSpawnPoint;
+
 
 	// Death EFFECTS
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
 		UParticleSystem* DeathParticle;
+
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
 		USoundBase* DeathSound;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
@@ -83,36 +104,38 @@ protected:
 
 	void RotateTurret(FVector LookAtTarget);
 
-	void MoveTank(FVector NewLocation);
+	virtual void MoveTank(FVector NewLocation);
 
-	void Fire();
+	//void Fire();
+	virtual void Fire();
 
 	//Change in child class: if turret or tank
 	virtual void HandleDestruction();
 
 
-	void ResetFury();
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
-		float FuryDuration=3.f;
+	
+	
 
 
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void HealingMe();
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	int32 Fury = 1;
-
-	UFUNCTION(BlueprintCallable)
-	void FuryMe();
-
-
-	UFUNCTION(BlueprintPure)
-	float GetFury();
+	void HealingMe(int Delta=10);
 
 	
+
+	
+
+
+	
+
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Save();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void Load();
+
 
 
 

@@ -1,12 +1,29 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PawnTank.h"
+
+#include "ToonTanks/Actors/ProjectileBase.h"
+
+
+//Engine
 //#include "Engine.h"
+#include "Engine/World.h"
+#include "Engine/EngineTypes.h"
+#include "TimerManager.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "Camera/CameraComponent.h"
+
+//Components
+#include "Components/StaticMeshComponent.h"
+//#include "Components/SceneComponent.h"
+#include "Components/CapsuleComponent.h"
+
+
 
 #include  "ToonTanks/Components/HealthComponent.h"
+
+//#include "ToonTanks/Actors/RescueZone.h"
 
 
 APawnTank::APawnTank()
@@ -29,6 +46,9 @@ void APawnTank::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerControllerRef = Cast<APlayerController>(GetController());
+
+	//Muy Importante Descomentar en la versión Shipped
+	//Load(); //For Debug
 }
 
 
@@ -40,6 +60,8 @@ void APawnTank::Tick(float DeltaTime)
 	Rotate();
 	Move();
 
+
+	//Requiere Visibility
 	PlayerControllerRef->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
 
 	FVector HitLocation = TraceHitResult.ImpactPoint;
@@ -136,6 +158,55 @@ void APawnTank::EnableTurbo()
 	//Clear Timer To EanbleTurbo
 }
 
+void APawnTank::Fire()
+{
+	
+	
+	if (GetMissingInAction() >= GetMaxPassenger())
+	{
+		if (!ProjectileClassLv3)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Could not Fire!!... ProjectileClassLv3 is NONE"));
+			return;
+		}
+
+		FVector  ProjectileSpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+		FRotator ProjectileSpawnRotator = ProjectileSpawnPoint->GetComponentRotation();
+
+		AProjectileBase* ProjectileLv3 = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClassLv3, ProjectileSpawnLocation, ProjectileSpawnRotator);
+		UE_LOG(LogTemp, Warning, TEXT("Fire!!... ProjectileClassLv3 "));
+		ProjectileLv3->SetOwner(this);
+
+		return;
+	}
+
+	if ( GetMissingInAction() >= GetMaxPassenger() / 2)
+	{
+
+		if (!ProjectileClassLv2)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Could not Fire!!... ProjectileClassLv2 is NONE"));
+			return;
+		}
+		
+			FVector  ProjectileSpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+			FRotator ProjectileSpawnRotator = ProjectileSpawnPoint->GetComponentRotation();
+			
+
+			AProjectileBase* ProjectileLv2 = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClassLv2, ProjectileSpawnLocation, ProjectileSpawnRotator);
+			UE_LOG(LogTemp, Warning, TEXT("Fire!!... ProjectileClassLv2 "));
+			ProjectileLv2->SetOwner(this);
+
+			return;
+		
+	}
+
+	
+	Super::Fire();
+	
+	
+}
+
 int32 APawnTank::GetMissingInAction() const
 {
 	return MissingInActions;
@@ -144,6 +215,11 @@ int32 APawnTank::GetMissingInAction() const
 void APawnTank::SetMissingInAction(int32 NewRescued)
 {
 	MissingInActions += NewRescued;
+
+	//if(MissingInActions>= MaxPassenger) UE_LOG(LogTemp, Warning, TEXT("APawnTank SetMissingInAction  Passenger Complete:  %i"), MissingInActions);
+	MissingInActions = FMath::Clamp(MissingInActions, 0, MaxPassenger);
+
+
 }
 
 
@@ -169,4 +245,26 @@ void APawnTank::HandleDestruction()
 }
 
 
+bool APawnTank::GetIsInZoneRescue() const
+{
+	return bIsInZoneRescue;
+}
+
+void APawnTank::SetIsInZoneRescue()
+{
+
+	bIsInZoneRescue= true;	
+	//GetCapsule()->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));	
+
+}
+
+
+void APawnTank::ResetIsInZoneRescue()
+{
+
+	bIsInZoneRescue = false;
+
+	//GetCapsule()->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+
+}
 
