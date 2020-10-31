@@ -49,6 +49,7 @@ void APawnTank::BeginPlay()
 
 	//Muy Importante Descomentar en la versión Shipped
 	//Load(); //For Debug
+	//Load();
 }
 
 

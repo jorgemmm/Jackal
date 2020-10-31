@@ -233,7 +233,9 @@ void ATankGameModeBase::HandleGameOver(bool PlayerWon)
 		LevelID = TankGI->GetLevelID();	
 		
 		//Para recibir feedback en itch.io or discord
-		int32 lastMissionMap = 1; //fOR sHIPPING lastMission=5+         
+		int32 lastMissionMap = 2; //fOR sHIPPING lastMission=5+   
+
+
 		if(LevelID>= lastMissionMap)GameOver(true);
 		
 

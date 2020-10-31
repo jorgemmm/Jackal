@@ -103,6 +103,7 @@ void APawnBase::RotateTurret(FVector LookAtTarget)
 	// Find Rotation value to look at. Rot Start  pos x e y del target y z de la torreta
 	
 	FVector StartLocation = TurretMesh->GetComponentLocation();
+
 	FRotator TurretRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation,
 		FVector(LookAtTarget.X, LookAtTarget.Y, TurretMesh->GetComponentLocation().Z));
 
