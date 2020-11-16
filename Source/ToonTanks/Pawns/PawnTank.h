@@ -20,6 +20,8 @@ Sino heredan de  esta clase no funcionará bien el Game Mode
 class USpringArmComponent;
 class UCameraComponent;
 
+class UParticleSystem;
+class USoundBase;
 
 
 UCLASS()
@@ -50,7 +52,13 @@ public:
 
 	virtual void HandleDestruction() override;
 
-	
+	virtual void RotateTurret(FVector LookAtTarget) override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void IsCoolDown();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void IsJustFiring();
 
 private:
 
@@ -60,13 +68,26 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components",	meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
 
-	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* TurretSpringArm;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* TurretCamera;
+
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
+	UParticleSystem* HotParticle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
+	USoundBase* HotSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hero Settings", meta = (AllowPrivateAccess = "true"))
 	float MoveSpeed = 100.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hero Settings", meta = (AllowPrivateAccess = "true"))	
 	float RotateSpeed = 100.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hero Settings", meta = (AllowPrivateAccess = "true"))
+	float TurretRotateSpeed = 75.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MissingInAction", meta = (AllowPrivateAccess = "true"))
 		int32 MissingInActions;
@@ -92,10 +113,17 @@ private:
 	void Move();
 	void Rotate();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hero Settings", meta = (AllowPrivateAccess = "true"))
+	float Temperatura;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hero Settings", meta = (AllowPrivateAccess = "true"))
+	float TempMax=75;
+	void CoolDown();
+	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hero Settings", meta = (AllowPrivateAccess = "true"))
+	bool bIsCooldown;
 	//Upgrade
-	void Turbo();
-	bool IsTurboEnable;	
-	void EnableTurbo();
+	
 
 	//Variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
@@ -108,32 +136,54 @@ private:
 
 	virtual void Fire() override;
 
+	float CurrentYaw;
+
 protected:
+	void Rotate(float DeltaTime);
+
+	
+
+	
+
 
 public:
 
 	UFUNCTION(BlueprintPure)
 		int32 GetMissingInAction() const;
-
+	
+	
 	
 
 	UFUNCTION(BlueprintCallable)
 		void SetMissingInAction(int32 NewRescued);
 
-
+	
 
 	
 	UFUNCTION(BlueprintPure)
 		int32 GetMaxPassenger() const;
+
 	
+
 	/**Indica si estamos en zona de recate*/
 	UFUNCTION(BlueprintPure)
 		bool GetIsInZoneRescue() const;
+
+	UFUNCTION(BlueprintPure)
+		float GetTemperatura() const;
+
+	/*UFUNCTION(BlueprintCallable)
+		void ResetTemperature();*/
+
+
 
 	UFUNCTION(BlueprintCallable)
 		void SetIsInZoneRescue();
 
 	UFUNCTION(BlueprintCallable)
 		void ResetIsInZoneRescue();
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeCameraView(bool bInBaseRoot);
 
 };

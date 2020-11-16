@@ -104,16 +104,29 @@ void APawnBase::RotateTurret(FVector LookAtTarget)
 	
 	FVector StartLocation = TurretMesh->GetComponentLocation();
 
-	FRotator TurretRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation,
-		FVector(LookAtTarget.X, LookAtTarget.Y, TurretMesh->GetComponentLocation().Z));
 
-	// Rotate Turret.
-	TurretMesh->SetWorldRotation(TurretRotation);
-	//TurretMesh->SetWorldRotation(TurretRotation,true,nullptr,ETeleportType::ResetPhysics);
 
 	
+	
+	
+
+	FRotator TurretRotation = UKismetMathLibrary::FindLookAtRotation(
+		StartLocation,		
+		FVector(LookAtTarget.X, LookAtTarget.Y, TurretMesh->GetComponentLocation().Z)
+	
+	);
+	    
+	
+	// Rotate Turret.
+
+	TurretMesh->SetWorldRotation(TurretRotation);
+	
+
+	//
 
 }
+
+
 
 void APawnBase::MoveTank(FVector NewLocation)
 {

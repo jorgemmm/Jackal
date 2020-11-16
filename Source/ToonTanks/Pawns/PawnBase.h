@@ -56,6 +56,7 @@ public:
 	FORCEINLINE class UStaticMeshComponent* GetTurretMesh() const { return TurretMesh; }
 
 
+	
 private:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category="Components", 
 		meta= ( AllowPrivateAccess ="true") )
@@ -98,11 +99,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
 		USoundBase* DeathSound;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UCameraShake>  DeathShake;
 
 
-	void RotateTurret(FVector LookAtTarget);
+	virtual void RotateTurret(FVector LookAtTarget);
 
 	virtual void MoveTank(FVector NewLocation);
 

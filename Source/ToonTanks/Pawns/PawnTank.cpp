@@ -2,8 +2,10 @@
 
 #include "PawnTank.h"
 
+//Actor and pawns
 #include "ToonTanks/Actors/ProjectileBase.h"
-
+#include  "ToonTanks/Components/HealthComponent.h"
+//#include "ToonTanks/Actors/RescueZone.h"
 
 //Engine
 //#include "Engine.h"
@@ -21,9 +23,11 @@
 
 
 
-#include  "ToonTanks/Components/HealthComponent.h"
+//Libraries
+#include "Kismet/GameplayStatics.h"
+#include  "Kismet\KismetMathLibrary.h"
+#include "Particles/ParticleSystem.h"
 
-//#include "ToonTanks/Actors/RescueZone.h"
 
 
 APawnTank::APawnTank()
@@ -31,20 +35,54 @@ APawnTank::APawnTank()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
 	
 	SpringArm->SetupAttachment(RootComponent);
-	
+	//SpringArm->SetupAttachment(GetTurretMesh());
+
 	Camera= CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+	
+	
+	
+	//Other view
+	TurretSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Turret Spring Arm"));	
+	//TurretSpringArm->SetupAttachment(GetCapsule());
+	TurretSpringArm->SetupAttachment(GetTurretMesh());
+	//TurretSpringArm->Activate(false);
 
-	
-	
+	TurretCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Turret Camera"));	
+	TurretCamera->SetupAttachment(TurretSpringArm);
+	TurretCamera->Activate(false);
 }
 
+void APawnTank::ChangeCameraView(bool bInBaseRoot)
+{
+	//default false 
+	Camera->Activate(false);
+	TurretCamera->Activate(false);
+
+	if (bInBaseRoot) 
+	{ 
+		
+		
+		Camera->Activate(true);
+		
+	}
+	else
+	{
+		
+		
+		TurretCamera->Activate(true);
+		
+
+	}
+
+	
+}
 
 // Called when the game starts or when spawned
 void APawnTank::BeginPlay()
 {
 	Super::BeginPlay();
-
+	Temperatura = 0;
 	PlayerControllerRef = Cast<APlayerController>(GetController());
 
 	//Muy Importante Descomentar en la versión Shipped
@@ -69,10 +107,70 @@ void APawnTank::Tick(float DeltaTime)
 
 	//UE_LOG(LogTemp, Warning, TEXT("FIRE!! at hole to: %s"), *HitLocation.ToString());
 
+
+
+	//Super::RotateTurret(HitLocation);
 	RotateTurret(HitLocation);
+
+	//RotateBase(HitLocation)
+}
+
+void APawnTank::Rotate(float DeltaTime)
+{
+	CurrentYaw = GetTurretMesh()->GetComponentRotation().Yaw;
 
 
 }
+
+void APawnTank::RotateTurret(FVector LookAtTarget)
+{
+	//update TurretMesh to face the LookAtTarget passed in from the child Class
+	// TurretMesh->SetWorldRotation()...
+	// Find Rotation value to look at. Rot Start  pos x e y del target y z de la torreta
+	 FVector StartLocation = GetTurretMesh()->GetComponentLocation();
+
+
+
+	
+	if ( ((LookAtTarget.X < 100.f) && (LookAtTarget.X > -100.f))  ||
+		 ((LookAtTarget.Y < 100.f) && (LookAtTarget.Y > -100.f))
+		)
+	{
+		    float Target_x = 0.f;
+			float Target_y = 0.f;
+			//Target_x = FMath::Clamp(LookAtTarget.X, -CameraMaxMovement, +10.f);
+
+			FRotator TurretRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation,
+				//FVector(LookAtTarget.X, LookAtTarget.Y, TurretMesh->GetComponentLocation().Z));
+				FVector(Target_x, Target_y, GetTurretMesh()->GetComponentLocation().Z));
+
+			// Rotate Turret.
+			GetTurretMesh()->SetWorldRotation(TurretRotation);
+	}
+	else
+	{
+		Super::RotateTurret(LookAtTarget);
+	}
+
+	
+
+
+
+
+
+	
+	//TurretMesh->SetWorldRotation(TurretRotation,true,nullptr,ETeleportType::ResetPhysics);
+
+	//
+	
+	
+
+	
+
+}
+
+
+
 
 
 // Called to bind functionality to input
@@ -132,37 +230,46 @@ void APawnTank::Rotate()
 	AddActorLocalRotation(RotationDirection, true);
 }
 
-
-
-void APawnTank::Turbo()
+void APawnTank::CoolDown()
 {
-	//if (turbo habilitado)
-	{
-		//Multiplica Move Speed Rotate
-		//Toglle IsTurboEnable to false
-		//Set timer To Enable Turbo 3 sg.
+	if(!HotParticle)
+	UGameplayStatics::SpawnEmitterAtLocation(this, HotParticle, GetActorLocation());
+
+	if(!HotSound)
+	UGameplayStatics::PlaySoundAtLocation(this, HotSound, GetActorLocation());
 
 
-	}
-	//else
-	{ 
-		
-	}
-	
-	
 }
 
-void APawnTank::EnableTurbo()
-{
-	//Toggle IsTurboEnable To true
 
-	//Clear Timer To EanbleTurbo
-}
+
+
 
 void APawnTank::Fire()
 {
 	
+
 	
+	if (bIsCooldown)
+	{
+	 
+		UE_LOG(LogTemp, Warning, TEXT("Arma sobrecalentada"));
+
+		CoolDown();
+		IsCoolDown();
+		return;
+	}
+
+
+	Temperatura++;
+
+	if (Temperatura >= TempMax)bIsCooldown = true;
+	else bIsCooldown = false;
+
+	UE_LOG(LogTemp, Error, TEXT("Temperatura: %f"), Temperatura);
+
+	IsJustFiring();
+
 	if (GetMissingInAction() >= GetMaxPassenger())
 	{
 		if (!ProjectileClassLv3)
@@ -177,6 +284,9 @@ void APawnTank::Fire()
 		AProjectileBase* ProjectileLv3 = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClassLv3, ProjectileSpawnLocation, ProjectileSpawnRotator);
 		UE_LOG(LogTemp, Warning, TEXT("Fire!!... ProjectileClassLv3 "));
 		ProjectileLv3->SetOwner(this);
+
+		Temperatura+=2.f;
+		
 
 		return;
 	}
@@ -197,6 +307,8 @@ void APawnTank::Fire()
 			AProjectileBase* ProjectileLv2 = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClassLv2, ProjectileSpawnLocation, ProjectileSpawnRotator);
 			UE_LOG(LogTemp, Warning, TEXT("Fire!!... ProjectileClassLv2 "));
 			ProjectileLv2->SetOwner(this);
+			
+			Temperatura++;
 
 			return;
 		
@@ -250,6 +362,14 @@ bool APawnTank::GetIsInZoneRescue() const
 {
 	return bIsInZoneRescue;
 }
+
+
+
+float APawnTank::GetTemperatura() const
+{
+	return Temperatura;
+}
+
 
 void APawnTank::SetIsInZoneRescue()
 {
