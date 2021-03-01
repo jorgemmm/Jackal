@@ -22,7 +22,7 @@ class UCameraComponent;
 
 class UParticleSystem;
 class USoundBase;
-
+class APlayerController;
 
 UCLASS()
 class TOONTANKS_API APawnTank: public APawnBase
@@ -52,7 +52,7 @@ public:
 
 	virtual void HandleDestruction() override;
 
-	virtual void RotateTurret(FVector LookAtTarget) override;
+	//virtual void RotateTurret(FVector LookAtTarget) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void IsCoolDown();
@@ -99,7 +99,7 @@ private:
 	FQuat RotationDirection;
 
 	APlayerController* PlayerControllerRef;
-	FHitResult TraceHitResult;
+	//FHitResult TraceHitResult;
 
 	
 	bool bAlive = true;
@@ -140,7 +140,7 @@ private:
 
 protected:
 	void Rotate(float DeltaTime);
-
+	
 	
 
 	

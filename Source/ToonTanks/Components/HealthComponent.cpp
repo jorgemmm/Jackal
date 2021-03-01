@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include  "HealthComponent.h"
+#include  "ToonTanks/Components/HealthComponent.h"
 //Engine
 #include  "ToonTanks/GameMode/TankGameModeBase.h"
 
@@ -50,6 +50,20 @@ void UHealthComponent::BeginPlay()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s: is a Boss  "), *Owner->GetName() );
 		}
+
+
+		if (Owner->ActorHasTag(TEXT("player")))
+		{
+		
+			if(!HealthySound)
+			{
+				UE_LOG(LogTemp, Error, TEXT(" Healthy Sound is none or nullptr in healthcomponent"));
+				return;
+			}
+			UGameplayStatics::PlaySound2D(this, HealthySound);
+		
+		}
+
 	}
 	else
 	{
@@ -72,9 +86,12 @@ void UHealthComponent::BeginPlay()
 void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	
-
-	if (Damage == 0 || Health == 0)
+	UE_LOG(LogTemp, Warning, TEXT("Damage tank hero by %s") , *DamageCauser->GetName());
+	
+	if (Damage == 0 )//|| Health == 0)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Damaging tank With zero value"));
+		
 		return;
 	}
 	
@@ -117,7 +134,22 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 
 		Health = FMath::Clamp( AmountDamage , 0.f, DefaultHealth);
 
+		//Sonido sin early return
+		if( DeathlyHealthSound && LowHealthSound && HealthySound )
+		{
+			if (Health <= 25)  UGameplayStatics::PlaySound2D(this, DeathlyHealthSound);
+
+			else if (Health <= 50)  UGameplayStatics::PlaySound2D(this, LowHealthSound);
+
+			else   UGameplayStatics::PlaySound2D(this, HealthySound);
+			
+		}
+		else 
+		{
+			UE_LOG(LogTemp, Error, TEXT("Sounds are none or nullptr in healthcomponent"));
+		}
 		
+
 	}
 	else 
 	{
@@ -144,6 +176,7 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 			UE_LOG(LogTemp, Warning, TEXT("Health component has no reference to the GameMode"));
 		}
 	}
+
 
 	//bIsDamaged = true;
 

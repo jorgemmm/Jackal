@@ -37,6 +37,14 @@ public:
 	float DefaultHealth = 100.0f;
 	
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
+	USoundBase* HealthySound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
+	USoundBase* LowHealthSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
+	USoundBase* DeathlyHealthSound;
 
 	AActor* Owner;
 

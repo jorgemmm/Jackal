@@ -1,16 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "PawnTank.h"
+#include "ToonTanks/Pawns/PawnTank.h"
 
 //Actor and pawns
-#include "ToonTanks/Actors/ProjectileBase.h"
+#include  "ToonTanks/Actors/ProjectileBase.h"
 #include  "ToonTanks/Components/HealthComponent.h"
-//#include "ToonTanks/Actors/RescueZone.h"
+#include  "ToonTanks/Actors/RescueZone.h"
 
 //Engine
-//#include "Engine.h"
+#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Engine/EngineTypes.h"
+#include "InputCoreTypes.h"
 #include "TimerManager.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -25,7 +26,7 @@
 
 //Libraries
 #include "Kismet/GameplayStatics.h"
-#include  "Kismet\KismetMathLibrary.h"
+#include "Kismet\KismetMathLibrary.h"
 #include "Particles/ParticleSystem.h"
 
 
@@ -37,20 +38,23 @@ APawnTank::APawnTank()
 	SpringArm->SetupAttachment(RootComponent);
 	//SpringArm->SetupAttachment(GetTurretMesh());
 
-	Camera= CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(SpringArm);
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera-> SetupAttachment(SpringArm);
 	
 	
 	
 	//Other view
 	TurretSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Turret Spring Arm"));	
-	//TurretSpringArm->SetupAttachment(GetCapsule());
-	TurretSpringArm->SetupAttachment(GetTurretMesh());
+	TurretSpringArm->SetupAttachment(GetCapsule());
+
+	//TurretSpringArm->SetupAttachment(GetTurretMesh());
 	//TurretSpringArm->Activate(false);
 
 	TurretCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Turret Camera"));	
 	TurretCamera->SetupAttachment(TurretSpringArm);
 	TurretCamera->Activate(false);
+
+
 }
 
 void APawnTank::ChangeCameraView(bool bInBaseRoot)
@@ -100,19 +104,48 @@ void APawnTank::Tick(float DeltaTime)
 	Move();
 
 
+	TArray<TEnumAsByte<EObjectTypeQuery> > ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));
+	
+	//TArray<>
 	//Requiere Visibility
-	PlayerControllerRef->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+	
+	//FHitResult TraceHitResult
+	//PlayerControllerRef->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+	//FVector HitLocation = TraceHitResult.ImpactPoint;
+	//FVector HitLocation = TraceHitResult.ImpactPoint;
+	//RotateTurret(HitLocation);
+	
+	
+	FHitResult Hit, FingerHit;
+	PlayerControllerRef->GetHitResultUnderCursorForObjects(ObjectTypes, true, Hit);
+	
+	//ETouchIndex::Type FingerIndex::Touch3;
+	//ECollisionChannel TraceChannel;
 
-	FVector HitLocation = TraceHitResult.ImpactPoint;
+	//For Mobile
+	PlayerControllerRef->GetHitResultUnderFinger(ETouchIndex::Type::Touch3, ECC_Visibility,true, FingerHit);
 
-	//UE_LOG(LogTemp, Warning, TEXT("FIRE!! at hole to: %s"), *HitLocation.ToString());
+	//PlayerControllerRef->GetHitResultUnderFinger(ETouchIndex::Type::Touch3, ECC_Visibility, true, FingerHit);
+	if (Hit.bBlockingHit || FingerHit.bBlockingHit)
+	{
+		//RotateTurret(FingerHit.ImpactPoint);
+		if(Hit.bBlockingHit)RotateTurret(Hit.ImpactPoint);
+		if(FingerHit.bBlockingHit)RotateTurret(FingerHit.ImpactPoint);
+
+	}
+	else
+	{
+		RotateTurret(GetActorForwardVector());
+	}
+	
 
 
+	
+	
 
-	//Super::RotateTurret(HitLocation);
-	RotateTurret(HitLocation);
-
-	//RotateBase(HitLocation)
+	
 }
 
 void APawnTank::Rotate(float DeltaTime)
@@ -122,53 +155,54 @@ void APawnTank::Rotate(float DeltaTime)
 
 }
 
-void APawnTank::RotateTurret(FVector LookAtTarget)
-{
-	//update TurretMesh to face the LookAtTarget passed in from the child Class
-	// TurretMesh->SetWorldRotation()...
-	// Find Rotation value to look at. Rot Start  pos x e y del target y z de la torreta
-	 FVector StartLocation = GetTurretMesh()->GetComponentLocation();
-
-
-
-	
-	if ( ((LookAtTarget.X < 100.f) && (LookAtTarget.X > -100.f))  ||
-		 ((LookAtTarget.Y < 100.f) && (LookAtTarget.Y > -100.f))
-		)
-	{
-		    float Target_x = 0.f;
-			float Target_y = 0.f;
-			//Target_x = FMath::Clamp(LookAtTarget.X, -CameraMaxMovement, +10.f);
-
-			FRotator TurretRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation,
-				//FVector(LookAtTarget.X, LookAtTarget.Y, TurretMesh->GetComponentLocation().Z));
-				FVector(Target_x, Target_y, GetTurretMesh()->GetComponentLocation().Z));
-
-			// Rotate Turret.
-			GetTurretMesh()->SetWorldRotation(TurretRotation);
-	}
-	else
-	{
-		Super::RotateTurret(LookAtTarget);
-	}
-
-	
-
-
-
-
-
-	
-	//TurretMesh->SetWorldRotation(TurretRotation,true,nullptr,ETeleportType::ResetPhysics);
-
-	//
-	
-	
-
-	
-
-}
-
+//
+//void APawnTank::RotateTurret(FVector LookAtTarget)
+//{
+//	//update TurretMesh to face the LookAtTarget passed in from the child Class
+//	// TurretMesh->SetWorldRotation()...
+//	// Find Rotation value to look at. Rot Start  pos x e y del target y z de la torreta
+//	 FVector StartLocation = GetTurretMesh()->GetComponentLocation();
+//
+//
+//
+//	
+//	if ( ((LookAtTarget.X < 100.f) && (LookAtTarget.X > -100.f))  ||
+//		 ((LookAtTarget.Y < 100.f) && (LookAtTarget.Y > -100.f))
+//		)
+//	{
+//		    float Target_x = 0.f;
+//			float Target_y = 0.f;
+//			//Target_x = FMath::Clamp(LookAtTarget.X, -CameraMaxMovement, +10.f);
+//
+//			FRotator TurretRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation,
+//				//FVector(LookAtTarget.X, LookAtTarget.Y, TurretMesh->GetComponentLocation().Z));
+//				FVector(Target_x, Target_y, GetTurretMesh()->GetComponentLocation().Z));
+//
+//			// Rotate Turret.
+//			GetTurretMesh()->SetWorldRotation(TurretRotation);
+//	}
+//	else
+//	{
+//		Super::RotateTurret(LookAtTarget);
+//	}
+//
+//	
+//
+//
+//
+//
+//
+//	
+//	//TurretMesh->SetWorldRotation(TurretRotation,true,nullptr,ETeleportType::ResetPhysics);
+//
+//	//
+//	
+//	
+//
+//	
+//
+//}
+//
 
 
 

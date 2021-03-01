@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ProjectileBase.h"
+#include "ToonTanks/Actors/ProjectileBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/StaticMeshComponent.h"
@@ -91,7 +91,7 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 		);
 
 
-		UE_LOG(LogTemp, Warning, TEXT("FIRE!! RadialDamage: %f"), RadialDamage);
+		UE_LOG(LogTemp, Warning, TEXT("FIRE!! RadialDamage: %f to %s"), RadialDamage,*OtherActor->GetName());
 		UGameplayStatics::ApplyRadialDamage(
 			OtherActor,
 			RadialDamage,
@@ -105,7 +105,7 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 			
 		);
 
-		//DrawDebugSphere(GetWorld(), Hit.ImpactPoint , 20.f, 8.f, FColor::Yellow,false,3.0f,0,1.0f);
+		DrawDebugSphere(GetWorld(), Hit.ImpactPoint , RadialRange, 8.f, FColor::Yellow,false,3.0f,0,1.0f);
 
 		
 		//ProjectileMesh->AddForce(this->GetVelocity() * 100);

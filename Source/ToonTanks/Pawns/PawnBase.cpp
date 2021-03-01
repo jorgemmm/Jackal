@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PawnBase.h"
+#include "ToonTanks/Pawns/PawnBase.h"
 
 //Project
 #include "ToonTanks/Actors/ProjectileBase.h"
@@ -45,12 +45,21 @@ APawnBase::APawnBase()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
+	RootComponent = DefaultSceneRoot;
+
 	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
-	RootComponent = CapsuleComp;
+	//RootComponent = CapsuleComp;
+	CapsuleComp->SetupAttachment(RootComponent);
+	CapsuleComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	//CapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CapsuleComp->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+	CapsuleComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
 	
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
-	BaseMesh->SetupAttachment(RootComponent);
-	//BaseMesh->SetupAttachment(CapsuleComp);
+	//BaseMesh->SetupAttachment(RootComponent);
+	BaseMesh->SetupAttachment(CapsuleComp);
 	
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
 	TurretMesh->SetupAttachment(BaseMesh);

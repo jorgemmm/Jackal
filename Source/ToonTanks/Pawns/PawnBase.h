@@ -58,6 +58,11 @@ public:
 
 	
 private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components",
+		meta = (AllowPrivateAccess = "true"))
+	USceneComponent* DefaultSceneRoot;
+
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category="Components", 
 		meta= ( AllowPrivateAccess ="true") )
 	UCapsuleComponent*  CapsuleComp;
