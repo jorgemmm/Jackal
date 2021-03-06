@@ -1,6 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "ToonTanks/Pawns/PawnTank.h"
+#include "PawnTank.h"
+//#include "ToonTanks/Pawns/PawnTank.h"
 
 //Actor and pawns
 #include  "ToonTanks/Actors/ProjectileBase.h"
@@ -29,6 +30,7 @@
 #include "Kismet\KismetMathLibrary.h"
 #include "Particles/ParticleSystem.h"
 
+#include "Components/AudioComponent.h"
 
 
 APawnTank::APawnTank()
@@ -55,13 +57,35 @@ APawnTank::APawnTank()
 	TurretCamera->Activate(false);
 
 
+	
+	
 }
+
+
+// Called when the game starts or when spawned
+void APawnTank::BeginPlay()
+{
+	Super::BeginPlay();
+	Temperatura = 0;
+	PlayerControllerRef = Cast<APlayerController>(GetController());
+
+
+
+
+	//Muy Importante Descomentar en la versiï¿½n Shipped
+	//Load(); //For Debug
+	//Load();
+}
+
+
 
 void APawnTank::ChangeCameraView(bool bInBaseRoot)
 {
 	//default false 
 	Camera->Activate(false);
 	TurretCamera->Activate(false);
+
+	
 
 	if (bInBaseRoot) 
 	{ 
@@ -79,19 +103,7 @@ void APawnTank::ChangeCameraView(bool bInBaseRoot)
 
 	}
 
-	
-}
-
-// Called when the game starts or when spawned
-void APawnTank::BeginPlay()
-{
-	Super::BeginPlay();
-	Temperatura = 0;
-	PlayerControllerRef = Cast<APlayerController>(GetController());
-
-	//Muy Importante Descomentar en la versión Shipped
-	//Load(); //For Debug
-	//Load();
+	LastLocation = GetActorForwardVector();
 }
 
 
@@ -131,21 +143,22 @@ void APawnTank::Tick(float DeltaTime)
 	if (Hit.bBlockingHit || FingerHit.bBlockingHit)
 	{
 		//RotateTurret(FingerHit.ImpactPoint);
-		if(Hit.bBlockingHit)RotateTurret(Hit.ImpactPoint);
-		if(FingerHit.bBlockingHit)RotateTurret(FingerHit.ImpactPoint);
-
+		if (Hit.bBlockingHit) { RotateTurret(Hit.ImpactPoint); LastLocation =Hit.ImpactPoint;}
+		if (FingerHit.bBlockingHit) { RotateTurret(FingerHit.ImpactPoint); LastLocation = FingerHit.ImpactPoint;}		
 	}
 	else
 	{
-		RotateTurret(GetActorForwardVector());
+		
+		//RotateTurret(GetActorForwardVector());
+		RotateTurret(LastLocation);
 	}
 	
-
-
-	
 	
 
 	
+	
+	
+
 }
 
 void APawnTank::Rotate(float DeltaTime)
@@ -256,21 +269,42 @@ void APawnTank::CalculateRotateInput(float Value)
 
 void APawnTank::Move()
 {
-	AddActorLocalOffset(MoveDirection, true);
+	FHitResult Hit;
+	AddActorLocalOffset(MoveDirection, true, &Hit);
+	if (Hit.IsValidBlockingHit())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Algo ha bloqueado al PawnTank"));
+		MoveDirection = FVector::ZeroVector;
+		UE_LOG(LogTemp, Warning, TEXT("MoveDirection: %f "), MoveDirection.Size());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Nada Bloquea al PawnTank"));
+	}
+	//AddActorWorldOffset(MoveDirection, true);
 }
 
 void APawnTank::Rotate()
 {
 	AddActorLocalRotation(RotationDirection, true);
+	//AddActorWorldRotation(RotationDirection, true);
 }
 
 void APawnTank::CoolDown()
 {
-	if(!HotParticle)
-	UGameplayStatics::SpawnEmitterAtLocation(this, HotParticle, GetActorLocation());
+	if (HotParticle) {
 
-	if(!HotSound)
-	UGameplayStatics::PlaySoundAtLocation(this, HotSound, GetActorLocation());
+		
+
+		UGameplayStatics::SpawnEmitterAtLocation(this, HotParticle, GetActorLocation() + FVector(0.f, 0.f, 100.f));
+	}
+	
+
+	if (HotSound) {
+		UGameplayStatics::PlaySoundAtLocation(this, HotSound, GetActorLocation());
+		
+	}
+	
 
 
 }

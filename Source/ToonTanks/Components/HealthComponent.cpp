@@ -1,16 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include  "ToonTanks/Components/HealthComponent.h"
+#include  "HealthComponent.h"
+//#include  "ToonTanks/Components/HealthComponent.h"
 //Engine
 #include  "ToonTanks/GameMode/TankGameModeBase.h"
 
 //Pawns
 #include "ToonTanks/Pawns/PawnMissingCombat.h"
 #include "ToonTanks/Pawns/PawnTank.h"
+#include "ToonTanks/Pawns/PawnTankEnemy.h"
 
 //Utils
 #include  "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -25,6 +27,13 @@ UHealthComponent::UHealthComponent()
 	//Se carga con los valores de la instancia del objeto.
 	//pero no actualiza valores de editor
 	//Health = DefaultHealth; 
+
+	//MusicPlayedHealthy =   UGameplayStatics::CreateSound2D(this, HealthySound);
+	////MusicPlayedHealthy->SetupAttachment(GetOwner()->getcapsule);
+	//MusicPlayedLowHealthy = UGameplayStatics::CreateSound2D(this, LowHealthSound);
+	//MusicPlayedDeathly =  UGameplayStatics::CreateSound2D(this, DeathlyHealthSound);
+
+
 }
 
 
@@ -35,7 +44,7 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	//Se actualiza s i DefaultHealt se edita en el editor
-	//Porque BeginPlay se ejecuta despu�s de empezar y toma los valores del editor
+	//Porque BeginPlay se ejecuta despu�s de empezar y toma los valores del editor
 	Health = DefaultHealth;
 	// ...
 	GameModeRef = Cast<ATankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -54,14 +63,22 @@ void UHealthComponent::BeginPlay()
 
 		if (Owner->ActorHasTag(TEXT("player")))
 		{
-		
-			if(!HealthySound)
+			
+			UE_LOG(LogTemp, Warning, TEXT("%s: is a Player  "), *Owner->GetName());
+			/*if (!HealthySound)
 			{
 				UE_LOG(LogTemp, Error, TEXT(" Healthy Sound is none or nullptr in healthcomponent"));
 				return;
 			}
 			UGameplayStatics::PlaySound2D(this, HealthySound);
-		
+			*/
+			
+			
+		}
+
+		if (Owner->ActorHasTag(TEXT("enemy")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s: is a Enemy  "), *Owner->GetName());
 		}
 
 	}
@@ -98,7 +115,8 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 
 	if (Owner->ActorHasTag(TEXT("boss")))
 	{
-		
+		/* Dañanado al boss */
+
 		//Min 0 Max 100,  Add Damage
 		float AmountDamage = Health -(Damage / 5.f);
 
@@ -109,7 +127,7 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 		
 
 	}
-	else if(Owner->ActorHasTag(TEXT("player")))
+	else if (Owner->ActorHasTag(TEXT("player")))
 	{
 		//Player
 		//Min 0 Max 100,  Add Damage
@@ -120,41 +138,48 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 
 		if (PlayerPawn->GetMissingInAction() >= PlayerPawn->GetMaxPassenger())
 		{
-			AmountDamage = Health - (Damage / 5.f);			
+			AmountDamage = Health - (Damage / 5.f);
 
-		}else if (PlayerPawn->GetMissingInAction() >= PlayerPawn->GetMaxPassenger()/2 )
+		}
+		else if (PlayerPawn->GetMissingInAction() >= PlayerPawn->GetMaxPassenger() / 2)
 		{
 			AmountDamage = Health - (Damage / 2.f);
-			
+
 		}
 		/*else
 		{
 			Health = FMath::Clamp(Health - Damage,  0.f, DefaultHealth);
 		}*/
 
-		Health = FMath::Clamp( AmountDamage , 0.f, DefaultHealth);
+		Health = FMath::Clamp(AmountDamage, 0.f, DefaultHealth);
 
-		//Sonido sin early return
-		if( DeathlyHealthSound && LowHealthSound && HealthySound )
-		{
-			if (Health <= 25)  UGameplayStatics::PlaySound2D(this, DeathlyHealthSound);
 
-			else if (Health <= 50)  UGameplayStatics::PlaySound2D(this, LowHealthSound);
 
-			else   UGameplayStatics::PlaySound2D(this, HealthySound);
-			
-		}
-		else 
-		{
-			UE_LOG(LogTemp, Error, TEXT("Sounds are none or nullptr in healthcomponent"));
-		}
-		
+
 
 	}
-	else 
+	else if (Owner->ActorHasTag(TEXT("enemy")))
 	{
+		float AmountDamage = Health - (Damage / 2.f);
+
+		Health = FMath::Clamp(AmountDamage, 0.f, DefaultHealth);
+
+		//Health = FMath::Clamp(Health - Damage, 0.f, DefaultHealth);
+
+
+		//APawnTankEnemy* Enemy = Cast<APawnTankEnemy>(DamageCauser);
+
+		//No se permite fuego amigo entre tanques.
+		//if(Enemy) Health = FMath::Clamp(Health - 0.f, 0.f, DefaultHealth);
+
+	}	
+	else if (Owner->ActorHasTag(TEXT("turret")))
+	{
+		//Hero dañando a los tanques y torretas
+		//APawnTank* PlayerPawn = Cast<APawnTank>(DamageCauser);
 		//Turret o Enemytanks
 		//Min 0 Max 100,  Add Damage
+		//if(PlayerPawn) 
 		Health = FMath::Clamp(Health - Damage, 0.f, DefaultHealth);
 	}
 	
@@ -181,6 +206,23 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 	//bIsDamaged = true;
 
 
+}
+
+
+UAudioComponent* UHealthComponent::PlayMusic(USoundBase* PlaySound)
+{
+	
+	
+
+	/*if (MusicPlayedHealthy!=nullptr)    MusicPlayedHealthy->Stop();
+	if (MusicPlayedLowHealthy!=nullptr) MusicPlayedLowHealthy->Stop();
+	if (MusicPlayedDeathly!=nullptr)    MusicPlayedDeathly->Stop();*/
+	
+	return UGameplayStatics::SpawnSound2D(this, PlaySound);
+	 
+	
+	
+	
 }
 
 void UHealthComponent::Heal(float Delta)

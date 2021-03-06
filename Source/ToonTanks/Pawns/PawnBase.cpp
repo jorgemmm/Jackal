@@ -1,7 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "ToonTanks/Pawns/PawnBase.h"
+#include "PawnBase.h"
+//#include "ToonTanks/Pawns/PawnBase.h"
 
 //Project
 #include "ToonTanks/Actors/ProjectileBase.h"
@@ -224,6 +224,7 @@ void APawnBase::HandleDestruction()
 
 
 
+
 void APawnBase::HealingMe(int Delta)
 {
 
@@ -231,6 +232,11 @@ void APawnBase::HealingMe(int Delta)
 	
 	HealthComp->Heal(Delta);
 
+}
+
+UHealthComponent* APawnBase::GetPureHealthComponent() const
+{
+	return HealthComponent;
 }
 
 

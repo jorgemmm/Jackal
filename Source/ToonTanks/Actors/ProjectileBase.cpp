@@ -1,7 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "ToonTanks/Actors/ProjectileBase.h"
+#include "ProjectileBase.h"
+//#include "ToonTanks/Actors/ProjectileBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/StaticMeshComponent.h"
@@ -17,6 +17,13 @@
 
 #include "DrawDebugHelpers.h"
 
+
+//int32 DebugWeaponDrawing = 0;
+//FAutoConsoleVariableRef   CVARDebugWeaponDrawing(
+//	TEXT("ToonTanks.DebugProjectile"),
+//	DebugWeaponDrawing,
+//	TEXT("Draw Dbug Sphere for Projectile explosion"),
+//	ECVF_Cheat);
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -83,15 +90,15 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 		//Damage
 
 		UGameplayStatics::ApplyDamage(
-			OtherActor, 
-			PointDamage,			
-			MyOwner->GetInstigatorController(), 
-			this, 
+			OtherActor,
+			PointDamage,
+			MyOwner->GetInstigatorController(),
+			this,
 			DamageType
 		);
 
 
-		UE_LOG(LogTemp, Warning, TEXT("FIRE!! RadialDamage: %f to %s"), RadialDamage,*OtherActor->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("FIRE!! RadialDamage: %f to %s"), RadialDamage, *OtherActor->GetName());
 		UGameplayStatics::ApplyRadialDamage(
 			OtherActor,
 			RadialDamage,
@@ -100,13 +107,16 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 			DamageType,
 			IgnorethisActors,
 			this,
-			
-			MyOwner->GetInstigatorController()		
-			
+
+			MyOwner->GetInstigatorController()
+
 		);
 
-		DrawDebugSphere(GetWorld(), Hit.ImpactPoint , RadialRange, 8.f, FColor::Yellow,false,3.0f,0,1.0f);
+		//if (DebugWeaponDrawing > 0)
+		{
 
+			//DrawDebugSphere(GetWorld(), Hit.ImpactPoint, RadialRange, 8.f, FColor::Yellow, false, 3.0f, 0, 1.0f);
+		}
 		
 		//ProjectileMesh->AddForce(this->GetVelocity() * 100);
 

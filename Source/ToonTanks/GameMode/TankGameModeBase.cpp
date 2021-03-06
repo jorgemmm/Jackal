@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "TankGameModeBase.h"
@@ -85,7 +85,7 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
 	else if (APawnMissingCombat* MissigInAction = Cast<APawnMissingCombat>(DeadActor))
 	{
 		   Score += 5;
-		  //LLámalo desde la zona de rescate
+		  //LLï¿½malo desde la zona de rescate
 		     MissinInActions++;
 			if (MissinInActions >= MissingRequired  && TargetTurrets == 0)
 			{
@@ -125,7 +125,7 @@ int32 ATankGameModeBase::GetTargetTurretCount() const
 int32 ATankGameModeBase::GetMissingRequired() const
 {
 
-	//Llma aesta fun ción desde bluepront cada vez que destruyas una 
+	//Llma aesta fun ciï¿½n desde bluepront cada vez que destruyas una 
 	//carcel de drones
 
 	TSubclassOf<APawnMissingCombat> ClassToFind;
@@ -149,7 +149,7 @@ void ATankGameModeBase::SetMissingRequired()
 
 void ATankGameModeBase::HandleGameStart()
 {
-	//in beginplay¿?
+	//in beginplayï¿½?
 	// Get references and game win/lose conditions.
 	TargetTurrets = GetTargetTurretCount();
 
@@ -252,7 +252,7 @@ void ATankGameModeBase::HandleGameOver(bool PlayerWon)
 		//		
 		//GameStart();	
 		//
-		//Después de Gamestart
+		//Despuï¿½s de Gamestart
 		//Disable Pawn HandleDestruction (PawnTank->  Visibilitity, Tick , Setbisalive)
 	    //   
 		//PlayerTank->SetPlayerReAlive;
@@ -292,7 +292,7 @@ void ATankGameModeBase::DelayToStart()
 
 
 	//Vamos a utilizar un timer delegado
-	//porque dispara una función en otro objeto
+	//porque dispara una funciï¿½n en otro objeto
 	FTimerHandle PlayerEnableHandle;
 
 	//FTimerDelegate PlayerEnableDelegate = FTimerDelegate::CreateUObject(PlayerControllerRef, &APlayerControllerBase::SetPlayerEnabledState,true);		

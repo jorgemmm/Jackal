@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,6 +7,7 @@
 #include "HealthComponent.generated.h"
 
 class ATankGameModeBase;
+class UAudioComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TOONTANKS_API UHealthComponent : public UActorComponent
@@ -37,14 +38,27 @@ public:
 	float DefaultHealth = 100.0f;
 	
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
 	USoundBase* HealthySound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
 	USoundBase* LowHealthSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
 	USoundBase* DeathlyHealthSound;
+
+
+	UAudioComponent* PlayMusic(USoundBase* PlaySound);
+
+
+	/*Deprecated a nivel de game mode y en blueprint con nodo DoOnce*/
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MusicAsDamage")//, meta = (AllowPrivateAccess = "true"))
+	//UAudioComponent* MusicPlayerHealthy;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MusicAsDamage")//, meta = (AllowPrivateAccess = "true"))
+	//UAudioComponent* MusicPlayerLowHealthy;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MusicAsDamage")//, meta = (AllowPrivateAccess = "true"))
+	//UAudioComponent* MusicPlayerVeryHealthy;
+	
 
 	AActor* Owner;
 

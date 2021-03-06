@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -12,7 +12,7 @@
 /**
 
 Esta es la clase base de los enemigos
-Sino heredan de  esta clase no funcionará bien el Game Mode
+Sino heredan de  esta clase no funcionarï¿½ bien el Game Mode
 
  *
  */

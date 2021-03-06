@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -11,7 +11,7 @@
 /**
  
 Esta es la clase base de los players
-Sino heredan de  esta clase no funcionará bien el Game Mode
+Sino heredan de  esta clase no funcionarï¿½ bien el Game Mode
 
  
  */
@@ -95,7 +95,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MissingInAction", meta = (AllowPrivateAccess = "true"))
 		int32 MaxPassenger=10;
 
-	FVector MoveDirection;
+	FVector MoveDirection, LastLocation;
 	FQuat RotationDirection;
 
 	APlayerController* PlayerControllerRef;
@@ -133,6 +133,19 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<AProjectileBase> ProjectileClassLv3;
 
+	//Deprecated a nivel de game mode y en blueprint con nodo DoOnce
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
+		USoundBase* HealthySound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
+		USoundBase* LowHealthSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
+		USoundBase* DeathlyHealthSound;*/
+
+	
+
+	
 
 	virtual void Fire() override;
 

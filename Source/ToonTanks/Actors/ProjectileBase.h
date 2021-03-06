@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -49,19 +49,19 @@ private:
 	TSubclassOf<UDamageType> DamageType;
 
 	
-	/*Daño base Puntual o individual y 1/4 del radial */
+	/*Daï¿½o base Puntual o individual y 1/4 del radial */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projec_Damage", meta = (AllowPrivateAccess = "true"))
 	float BaseDamage = 20.f;
-	/*Radio de la explosión alcance del daño radial*/
+	/*Radio de la explosiï¿½n alcance del daï¿½o radial*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projec_Damage", meta = (AllowPrivateAccess = "true"))
 	float RadialRange = 25.0f;
 
 	
-	/*Daño Puntual*/
+	/*Daï¿½o Puntual*/
 	UPROPERTY()
 	float PointDamage;
 
-	/*Daño radial*/	
+	/*Daï¿½o radial*/	
 	UPROPERTY()
 	float RadialDamage;	
 	

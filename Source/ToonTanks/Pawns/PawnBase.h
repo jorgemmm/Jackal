@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -10,7 +10,7 @@
 /**
 
 Esta es la clase base de todos Los pawns
-Comportasmientos y características comunes a Enemigos, Players y PNJs
+Comportasmientos y caracterï¿½sticas comunes a Enemigos, Players y PNJs
 
 
  */
@@ -47,15 +47,17 @@ public:
 	void PawnDestroyed();   
 
 
-	FORCEINLINE class UCapsuleComponent* GetCapsule() const { return CapsuleComp; }
+	FORCEINLINE UCapsuleComponent* GetCapsule() const { return CapsuleComp; }
 
 	/** Return the mesh for the BaseMesh */
-	FORCEINLINE class UStaticMeshComponent* GetBaseMesh() const { return BaseMesh; }
+	FORCEINLINE UStaticMeshComponent* GetBaseMesh() const { return BaseMesh; }
 
 	/** Return the mesh for the BaseMesh */
-	FORCEINLINE class UStaticMeshComponent* GetTurretMesh() const { return TurretMesh; }
+	FORCEINLINE UStaticMeshComponent* GetTurretMesh() const { return TurretMesh; }
 
-
+	
+	/** Return the mesh for the BaseMesh */
+	FORCEINLINE UHealthComponent* GetForceInlineHealthComp() const { return HealthComponent; }
 	
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components",
@@ -74,9 +76,9 @@ private:
 	UStaticMeshComponent* TurretMesh;
 	
 	
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UHealthComponent* HealthComponent;
+	
 	
 	
 
@@ -134,7 +136,8 @@ public:
 	
 
 
-	
+	UFUNCTION(BlueprintPure)
+		UHealthComponent* GetPureHealthComponent() const;
 
 
 	UFUNCTION(BlueprintImplementableEvent)
