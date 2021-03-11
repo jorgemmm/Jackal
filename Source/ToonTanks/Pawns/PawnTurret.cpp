@@ -7,11 +7,15 @@
 #include "Engine/World.h"
 #include "PawnTank.h"
 
+#include "Components/SceneComponent.h"
+
+
 #include "Engine/EngineTypes.h"
 
 APawnTurret::APawnTurret()
 {
-	
+	//RootComponent = GetCapsule();
+
 }
 
 
@@ -23,6 +27,8 @@ void APawnTurret::BeginPlay()
 	UWorld* World = GetWorld();
 
 	PlayerPawn = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+
+	
 
 	if (World)
 	{
@@ -59,18 +65,20 @@ void APawnTurret::CheckFireCondition()
 	//if Player == Null || Is Dead Then BAIL!!
 	UE_LOG(LogTemp, Warning, TEXT("Soy: %s y mi Firerate es: %f"), *GetName(), FireRate);
 	
+	
 
 	if (!PlayerPawn || !PlayerPawn->GetPlayerAlive())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("No Detecto a al palyerpawn in PawnTurret"));
 		return;	
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("Detecto a al palyerpawn  %s "), *PlayerPawn->GetName());
 
 	//if Player Player  IS in Ranged Then Fire!!
 	if (ReturnDistanceToPlayer() <= FireRange)
 	{
 		// Fire
-		//UE_LOG(LogTemp, Warning, TEXT("FIRE!!"));
+		UE_LOG(LogTemp, Warning, TEXT("FIRE!!"));
 		Fire();
 	}
 

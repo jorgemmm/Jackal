@@ -20,7 +20,7 @@
 
 //Components
 #include "Components/StaticMeshComponent.h"
-//#include "Components/SceneComponent.h"
+#include "Components/SceneComponent.h"
 #include "Components/CapsuleComponent.h"
 
 
@@ -35,9 +35,14 @@
 
 APawnTank::APawnTank()
 {
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
+
+
+	//RootComponent = GetCapsule();
 	
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));	
 	SpringArm->SetupAttachment(RootComponent);
+
+	//SpringArm->SetupAttachment(GetCapsule());
 	//SpringArm->SetupAttachment(GetTurretMesh());
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -47,7 +52,7 @@ APawnTank::APawnTank()
 	
 	//Other view
 	TurretSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Turret Spring Arm"));	
-	TurretSpringArm->SetupAttachment(GetCapsule());
+	TurretSpringArm->SetupAttachment(RootComponent);
 
 	//TurretSpringArm->SetupAttachment(GetTurretMesh());
 	//TurretSpringArm->Activate(false);
@@ -70,7 +75,7 @@ void APawnTank::BeginPlay()
 	PlayerControllerRef = Cast<APlayerController>(GetController());
 
 
-
+	LastLocation = GetActorForwardVector();
 
 	//Muy Importante Descomentar en la versi�n Shipped
 	//Load(); //For Debug
@@ -103,7 +108,7 @@ void APawnTank::ChangeCameraView(bool bInBaseRoot)
 
 	}
 
-	LastLocation = GetActorForwardVector();
+
 }
 
 
@@ -123,12 +128,15 @@ void APawnTank::Tick(float DeltaTime)
 	//TArray<>
 	//Requiere Visibility
 	
-	//FHitResult TraceHitResult
-	//PlayerControllerRef->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-	//FVector HitLocation = TraceHitResult.ImpactPoint;
-	//FVector HitLocation = TraceHitResult.ImpactPoint;
-	//RotateTurret(HitLocation);
-	
+	/*FHitResult TraceHitResult
+	PlayerControllerRef->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+	FVector HitLocation = TraceHitResult.ImpactPoint;
+	FVector HitLocation = TraceHitResult.ImpactPoint;
+	RotateTurret(HitLocation);	
+	if (IsTwinSticShooter()) {
+		PlayerControllerRef->bShowMouseCursor = false;
+		return;
+	}*/
 	
 	FHitResult Hit, FingerHit;
 	PlayerControllerRef->GetHitResultUnderCursorForObjects(ObjectTypes, true, Hit);
@@ -155,68 +163,16 @@ void APawnTank::Tick(float DeltaTime)
 	
 	
 
-	
-	
-	
-
 }
 
-void APawnTank::Rotate(float DeltaTime)
+
+//Deprec
+void APawnTank::GetYawTurretRotate(float DeltaTime)
 {
-	CurrentYaw = GetTurretMesh()->GetComponentRotation().Yaw;
+	//TurretCurrentYaw = GetTurretMesh()->GetComponentRotation().Yaw;
 
 
 }
-
-//
-//void APawnTank::RotateTurret(FVector LookAtTarget)
-//{
-//	//update TurretMesh to face the LookAtTarget passed in from the child Class
-//	// TurretMesh->SetWorldRotation()...
-//	// Find Rotation value to look at. Rot Start  pos x e y del target y z de la torreta
-//	 FVector StartLocation = GetTurretMesh()->GetComponentLocation();
-//
-//
-//
-//	
-//	if ( ((LookAtTarget.X < 100.f) && (LookAtTarget.X > -100.f))  ||
-//		 ((LookAtTarget.Y < 100.f) && (LookAtTarget.Y > -100.f))
-//		)
-//	{
-//		    float Target_x = 0.f;
-//			float Target_y = 0.f;
-//			//Target_x = FMath::Clamp(LookAtTarget.X, -CameraMaxMovement, +10.f);
-//
-//			FRotator TurretRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation,
-//				//FVector(LookAtTarget.X, LookAtTarget.Y, TurretMesh->GetComponentLocation().Z));
-//				FVector(Target_x, Target_y, GetTurretMesh()->GetComponentLocation().Z));
-//
-//			// Rotate Turret.
-//			GetTurretMesh()->SetWorldRotation(TurretRotation);
-//	}
-//	else
-//	{
-//		Super::RotateTurret(LookAtTarget);
-//	}
-//
-//	
-//
-//
-//
-//
-//
-//	
-//	//TurretMesh->SetWorldRotation(TurretRotation,true,nullptr,ETeleportType::ResetPhysics);
-//
-//	//
-//	
-//	
-//
-//	
-//
-//}
-//
-
 
 
 
@@ -226,9 +182,28 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);
-	PlayerInputComponent->BindAxis("Turn", this, &APawnTank::CalculateRotateInput);
+	
+	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);	
+	
+	
+	PlayerInputComponent->BindAxis("TurnRight", this, &APawnTank::CalculateRotateInput);
+	
+	//Mirar gomvo`para configurar en opciones distintas entradas.
+	/*if (bIsTwinSticShooter)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Two stick now"));
+		PlayerInputComponent->BindAxis("TurnRight", this, &APawnTank::CalculateRotateInput);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("One stick now"));
+		PlayerInputComponent->BindAxis("Turn", this, &APawnTank::CalculateRotateInput);
+	}*/
+	
+	
+	
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);
+	
 	//PlayerInputComponent->BindAction("Turbo", IE_Pressed, &APawnTank::Turbo);
 
 }
@@ -248,6 +223,8 @@ void APawnTank::SetPlayerReAlive()
 
 	//TODO - Create new function to Do this. 
 	SetActorTickEnabled(true);
+
+
 }
 
 
@@ -262,15 +239,22 @@ void APawnTank::CalculateMoveInput(float Value)
 void APawnTank::CalculateRotateInput(float Value)
 {
 	float RotateAmount = Value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
+	
 	FRotator Rotation = FRotator(0, RotateAmount, 0);
-	RotationDirection = FQuat(Rotation);
+	
+	RotRotationDirection = Rotation;
+
+	QuatRotationDirection = FQuat(Rotation); //Like course With cuaternions
 
 }
 
 void APawnTank::Move()
 {
 	FHitResult Hit;
+	
+	//GetCapsule()->AddLocalOffset(MoveDirection, true, &Hit);
 	AddActorLocalOffset(MoveDirection, true, &Hit);
+	
 	if (Hit.IsValidBlockingHit())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Algo ha bloqueado al PawnTank"));
@@ -286,9 +270,13 @@ void APawnTank::Move()
 
 void APawnTank::Rotate()
 {
-	AddActorLocalRotation(RotationDirection, true);
-	//AddActorWorldRotation(RotationDirection, true);
+	//GetCapsule()->AddLocalRotation(RotationDirection, true);
+	AddActorLocalRotation(RotRotationDirection, true);	
+	//AddActorLocalRotation(QuatRotationDirection, true); //Like course
+	
 }
+
+
 
 void APawnTank::CoolDown()
 {
@@ -456,4 +444,8 @@ void APawnTank::ResetIsInZoneRescue()
 	//GetCapsule()->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 
 }
+
+
+
+
 

@@ -47,6 +47,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	
+
 	bool GetPlayerAlive();	
 	void SetPlayerReAlive();
 
@@ -96,7 +97,10 @@ private:
 		int32 MaxPassenger=10;
 
 	FVector MoveDirection, LastLocation;
-	FQuat RotationDirection;
+
+	FRotator RotRotationDirection;
+	
+	FQuat QuatRotationDirection; //Like course 
 
 	APlayerController* PlayerControllerRef;
 	//FHitResult TraceHitResult;
@@ -133,31 +137,22 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<AProjectileBase> ProjectileClassLv3;
 
-	//Deprecated a nivel de game mode y en blueprint con nodo DoOnce
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
-		USoundBase* HealthySound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
-		USoundBase* LowHealthSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MusicAsDamage", meta = (AllowPrivateAccess = "true"))
-		USoundBase* DeathlyHealthSound;*/
-
-	
-
 	
 
 	virtual void Fire() override;
 
-	float CurrentYaw;
+	
+
+	//Menú opciones con gonvo
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hero Settings", meta = (AllowPrivateAccess = "true"))
+		bool bIsTwinSticShooter;*/
 
 protected:
-	void Rotate(float DeltaTime);
 	
+	void GetYawTurretRotate(float DeltaTime); //Dpreca
 	
-
+	float TurretCurrentYaw; //Deprec
 	
-
 
 public:
 
@@ -198,5 +193,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeCameraView(bool bInBaseRoot);
+
+	
 
 };

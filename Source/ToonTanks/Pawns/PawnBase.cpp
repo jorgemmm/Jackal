@@ -19,7 +19,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 //#include "Components/PrimitiveComponent.h"
-//#include "Components/SceneComponent.h"
+
 
 #include  "ToonTanks/Components/HealthComponent.h"
 
@@ -45,27 +45,27 @@ APawnBase::APawnBase()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
-	RootComponent = DefaultSceneRoot;
+	/*DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
+	RootComponent = DefaultSceneRoot;*/
 
-	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
-	//RootComponent = CapsuleComp;
-	CapsuleComp->SetupAttachment(RootComponent);
-	CapsuleComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));	
+	RootComponent = GetCapsule();
+	//CapsuleComp->SetupAttachment(RootComponent);
+	CapsuleComp->SetCollisionProfileName(TEXT("Pawn"));
 	//CapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	CapsuleComp->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
-	CapsuleComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	//CapsuleComp->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+	//CapsuleComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 	
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
-	//BaseMesh->SetupAttachment(RootComponent);
-	BaseMesh->SetupAttachment(CapsuleComp);
+	BaseMesh->SetupAttachment(RootComponent);
+	//BaseMesh->SetupAttachment(CapsuleComp);
 	
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
-	TurretMesh->SetupAttachment(BaseMesh);
+	TurretMesh->SetupAttachment(GetBaseMesh());
 	
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
-	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
+	ProjectileSpawnPoint->SetupAttachment(GetTurretMesh());
 
 	HealthComponent= CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
@@ -239,4 +239,12 @@ UHealthComponent* APawnBase::GetPureHealthComponent() const
 	return HealthComponent;
 }
 
+
+
+
+void APawnBase::StartFire(FVector LookAtTarget)
+{
+	RotateTurret(LookAtTarget);
+	//Fire();
+}
 

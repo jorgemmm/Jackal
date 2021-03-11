@@ -49,12 +49,18 @@ APawnMissingCombat::APawnMissingCombat()
 	//SphereComponent->SetCollisionProfileName(TEXT("Pawn"));
 	//SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &APawnMissingCombat::NotifyActorBeginOverlap);
 
+
+
+	//RootComponent = GetCapsule();
+
 	ZoneToRescue = CreateDefaultSubobject<USphereComponent>(TEXT("Zone To Rescue"));
-	ZoneToRescue->SetupAttachment(GetBaseMesh());
-	//BaseMesh->SetupAttachment(RootComponent);
+	ZoneToRescue->SetupAttachment(GetBaseMesh());	
+	
+	//ZoneToRescue->SetupAttachment(RootComponent);
 	ZoneToRescue->InitSphereRadius(300.0f);	
 	ZoneToRescue->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-
+	
+	
 	
 	// GetCapsule()->
 	//Debe coincidir la signatura de la función  Para enlazar  D.I. correctamente

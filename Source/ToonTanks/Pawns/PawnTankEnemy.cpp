@@ -58,6 +58,7 @@ void APawnTankEnemy::Tick(float DeltaTime)
 
 	if ( !PlayerPawn || !PlayerPawn->GetPlayerAlive() ) 
 	{
+		UE_LOG(LogTemp, Warning, TEXT("No Detecto a al palyerpawn in PawnTurret"));
 		return;
 	}
 

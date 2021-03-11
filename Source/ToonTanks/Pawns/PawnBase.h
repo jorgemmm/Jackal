@@ -46,6 +46,7 @@ public:
 
 	void PawnDestroyed();   
 
+	//FORCEINLINE USceneComponent* GetDefaultRoot() const { return DefaultSceneRoot; }
 
 	FORCEINLINE UCapsuleComponent* GetCapsule() const { return CapsuleComp; }
 
@@ -60,14 +61,15 @@ public:
 	FORCEINLINE UHealthComponent* GetForceInlineHealthComp() const { return HealthComponent; }
 	
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components",
+
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components",
 		meta = (AllowPrivateAccess = "true"))
-	USceneComponent* DefaultSceneRoot;
+	USceneComponent* DefaultSceneRoot;*/
 
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category="Components", 
 		meta= ( AllowPrivateAccess ="true") )
-	UCapsuleComponent*  CapsuleComp;
+		UCapsuleComponent*  CapsuleComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* BaseMesh;
@@ -85,14 +87,17 @@ private:
 
 	UParticleSystemComponent* Particle;
 
+
+	
+
 protected:
 	
 	//Variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<AProjectileBase> ProjectileClass;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
-		AProjectileBase* Projectile;*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
+		AProjectileBase* Projectile;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint;
@@ -109,6 +114,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UCameraShake>  DeathShake;
+
+	
 
 
 	virtual void RotateTurret(FVector LookAtTarget);
@@ -138,6 +145,12 @@ public:
 
 	UFUNCTION(BlueprintPure)
 		UHealthComponent* GetPureHealthComponent() const;
+
+
+	UFUNCTION(BlueprintCallable)
+	virtual	void StartFire(FVector LookAtTarget);
+
+	
 
 
 	UFUNCTION(BlueprintImplementableEvent)
