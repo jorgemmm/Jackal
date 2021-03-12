@@ -28,7 +28,7 @@
 #include "Kismet/GameplayStatics.h"
 
 //#include "PawnTank.h"
-
+#define OUT
 
 // Sets default values
 ARescueZone::ARescueZone()
@@ -54,10 +54,8 @@ ARescueZone::ARescueZone()
 	EvacZone->SetupAttachment(RootComponent);//GetGetGroundRescueMesh() );
 
 	EvacZone->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	//RescueZone->GetScaledBoxExtent();
-	
-	EvacZone->OnComponentBeginOverlap.AddDynamic(this, &ARescueZone::OnOverBegin_EvacStart);
-	
+	//RescueZone->GetScaledBoxExtent();	
+	EvacZone->OnComponentBeginOverlap.AddDynamic(this, &ARescueZone::OnOverBegin_EvacStart);	
 	EvacZone->OnComponentEndOverlap.AddDynamic(this,   &ARescueZone::OnOverEnd_Player);
 
 }
@@ -212,7 +210,7 @@ void ARescueZone::OnOverEnd_Player(class UPrimitiveComponent* OverlappedComp, cl
 }
 
 
-/**Revosar si produce crash*/
+/**Repasar si produce crash*/
 void ARescueZone::OnOverBegin_EvacEnd(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
 {
 	//Debes dcirle al missing in action in tick que si tiene un rescue zone más cerca de 300 
@@ -228,14 +226,15 @@ void ARescueZone::OnOverBegin_EvacEnd(UPrimitiveComponent* HitComp, AActor* Othe
 			return;
 		}
 
+		
 		TArray<AActor*> FoundActors;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawnMissingCombat::StaticClass(), FoundActors);
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawnMissingCombat::StaticClass(), OUT FoundActors);
 
 		for (auto Actor : FoundActors)
 		{
 
-			APawnMissingCombat* PawnExtraction = Cast<APawnMissingCombat>(OtherActor);
-
+			//APawnMissingCombat* PawnExtraction = Cast<APawnMissingCombat>(OtherActor);
+			APawnMissingCombat* PawnExtraction = Cast<APawnMissingCombat>(Actor);
 
 
 			//Score
@@ -245,10 +244,15 @@ void ARescueZone::OnOverBegin_EvacEnd(UPrimitiveComponent* HitComp, AActor* Othe
 				return;
 
 			}
+			if (!PawnExtraction) 
+			{
+				UE_LOG(LogTemp, Error, TEXT("Casting APawnMissingCombat Failing in ARescueZone "));
+				return;
+			}
 			GameModeRef->ActorDied(PawnExtraction); //Actor->Destroy();
 			
 
-			PawnExtraction->HandleDestruction();
+			//PawnExtraction->HandleDestruction(); Mejor en Game Mode (Encargado de spawn y destroy actor)
 		}
 
 
@@ -258,11 +262,12 @@ void ARescueZone::OnOverBegin_EvacEnd(UPrimitiveComponent* HitComp, AActor* Othe
 
 
 
+//Debug only
 void ARescueZone::OnCompHit_EvacEnd(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (OtherActor && OtherActor != this)// && OtherComp)
 	{
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I Hit: %s"), *OtherActor->GetName()));
+		//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I Hit: %s"), *OtherActor->GetName()));
 	
 	}
 

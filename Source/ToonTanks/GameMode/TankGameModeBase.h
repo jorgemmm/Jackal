@@ -45,6 +45,7 @@ private:
 	
 
 	void HandleGameStart();
+	void HandleMisionRequired();
 	void HandleGameOver(bool PlayerWon);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
@@ -60,6 +61,8 @@ private:
 	int32 Score =0;
 
 	UTankGameGameInstance* TankGI;
+
+	
 
 public:
 	void ActorDied(AActor* DeadActor);

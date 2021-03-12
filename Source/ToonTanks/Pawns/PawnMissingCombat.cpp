@@ -162,7 +162,9 @@ void APawnMissingCombat::Tick(float DeltaTime)
 			//Near the player
 			//UE_LOG(LogTemp, Error, TEXT("PNJ Pawn tank Move from: %s   to: %s "),*GetActorLocation().ToCompactString(),	*PlayerPawn->GetActorLocation().ToCompactString());
 			//GetBaseMesh()->AddWorldOffset(Translation);
-			GetCapsule()->AddWorldOffset(Translation);
+			//GetCapsule()->AddWorldOffset(Translation);
+
+			AddActorWorldOffset(Translation, true);
 		}
 	
 	
@@ -335,7 +337,8 @@ void APawnMissingCombat::OnBOver_Rescue(UPrimitiveComponent* HitComp, AActor* Ot
 			Player->SetMissingInAction(1);
 			
 			Player->Save();  // upgrade the missil 
-			//Aumento Score
+			
+							//Aumento Score
 			//ATankGameModeBase* GameMode = Cast<ATankGameModeBase>( UGameplayStatics::GetGameMode(GetWorld()) );
 			
 			Player->GetPureHealthComponent()->GameModeRef->SetScore(5);

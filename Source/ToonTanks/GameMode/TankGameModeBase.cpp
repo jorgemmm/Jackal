@@ -70,39 +70,26 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
 		UE_LOG(LogTemp, Warning, TEXT("A EnemyPawn Died"));
 		
 		DestroyedTurret->PawnDestroyed();
+		
 		Score+=5;
-
-		//Score+=DestroyedTurret->ScoreValue Upgrade
-		//Score+=DestroyedTurret->GetScoreValue() Upgrade
-
 		TargetTurrets--;
-
-		/*if (TargetTurrets == 0)
-		{
-			HandleGameOver(true);
-		}*/
+		
+		HandleMisionRequired();
+		
 	}
 	else if (APawnMissingCombat* MissigInAction = Cast<APawnMissingCombat>(DeadActor))
 	{
-		   Score += 5;
-		  //LL�malo desde la zona de rescate
-		     MissinInActions++;
-			if (MissinInActions >= MissingRequired  && TargetTurrets == 0)
-			{
-				//TargetTurrets = 0;
-				MissinInActions = 0;
-				//MissingRequired = 0;
-				HandleGameOver(true);
-			}
-			else
-			{
 
-				UE_LOG(LogTemp, Warning, TEXT("Enemies Left: %f"), TargetTurrets);
-				UE_LOG(LogTemp, Warning, TEXT("Misssing Left: %i"), (MissingRequired- MissinInActions));
+		   MissigInAction->HandleDestruction();
+		  //Call from rescue zone
+		   Score += 5;		  
+		   MissinInActions++;
 
-			}
+		  HandleMisionRequired();
 
 	}
+
+
 
 }
 
@@ -196,6 +183,24 @@ void ATankGameModeBase::HandleGameStart()
 	}
 }
 
+void ATankGameModeBase::HandleMisionRequired()
+{
+	if ((MissinInActions >= MissingRequired) && TargetTurrets == 0)
+	{
+		//TargetTurrets = 0;
+		MissinInActions = 0;
+		//MissingRequired = 0;
+		HandleGameOver(true);
+	}
+	else
+	{
+
+		UE_LOG(LogTemp, Warning, TEXT("Enemies Left: %f"), TargetTurrets);
+		UE_LOG(LogTemp, Warning, TEXT("Misssing Left: %i"), (MissingRequired - MissinInActions));
+
+	}
+}
+
 void ATankGameModeBase::HandleGameOver(bool PlayerWon)
 {
 	// See if the player has destroyed all the turrets, show win result.   
@@ -222,7 +227,7 @@ void ATankGameModeBase::HandleGameOver(bool PlayerWon)
 		
 		if (!TankGI)
 		{
-			UE_LOG(LogTemp, Error, TEXT("GM.HandleGameOver PyerWon not Found or none"));
+			UE_LOG(LogTemp, Error, TEXT("GM.HandleGameOver PlayerWon not Found or none"));
 			DelayToStart();
 			return;
 		}
@@ -233,10 +238,11 @@ void ATankGameModeBase::HandleGameOver(bool PlayerWon)
 		LevelID = TankGI->GetLevelID();	
 		
 		//Para recibir feedback en itch.io or discord
-		int32 lastMissionMap = 2; //fOR sHIPPING lastMission=5+   
+		//fOR sHIPPING lastMission=5+
+		int32 lastMissionMap = 2;    
 
 
-		if(LevelID>= lastMissionMap)GameOver(true);
+		if( LevelID >= lastMissionMap) GameOver(true);
 		
 
 		UGameplayStatics::OpenLevel(GetWorld(), LevelNames[LevelID]);
@@ -283,7 +289,7 @@ void ATankGameModeBase::DelayToStart()
 {
 	
 	if(PlayerControllerRef)
-	PlayerControllerRef->SetPlayerEnabledState(false);
+		PlayerControllerRef->SetPlayerEnabledState(false);
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("GM.DelayToStartw PlayerController not Found or none"));

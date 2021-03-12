@@ -45,9 +45,12 @@ private:
 
 	
 
-	FVector Velocity;
+	FVector Velocity, Translation;
 
+	void Move();
 	FRotator RotateBase(FVector LookAtTarget);
+	
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 		float DistToShoot = 1000.0f;

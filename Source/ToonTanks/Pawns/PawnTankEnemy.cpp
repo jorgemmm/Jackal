@@ -73,11 +73,13 @@ void APawnTankEnemy::Tick(float DeltaTime)
 	//FVector Translation = Velocity * 100 * DeltaTime;
 	
 	
-	FVector Translation = UKismetMathLibrary::GetForwardVector(
-		 
+	Translation = UKismetMathLibrary::GetForwardVector(
+
+		
 		RotateBase(PlayerPawn->GetActorLocation())
 	);
 
+	
 	
 
 	//if  (CheckDistance(PlayerPawn))	
@@ -92,7 +94,11 @@ void APawnTankEnemy::Tick(float DeltaTime)
 			*PlayerPawn->GetActorLocation().ToString());*/
 		
 		FHitResult Hit;
-		GetBaseMesh()->AddWorldOffset(Translation,true, &Hit );	
+		
+			
+		
+		Move();  //AddActorWorldOffset(Translation, true, &Hit);
+		 
 		
 		
 	}
@@ -169,6 +175,13 @@ float APawnTankEnemy::ReturnDistanceToPlayer()
 	
 }
 
+
+void APawnTankEnemy::Move()
+{
+	FHitResult Hit;
+	AddActorWorldOffset(Translation, true, &Hit);
+
+}
 
 FRotator APawnTankEnemy::RotateBase(FVector LookAtTarget)
 {
