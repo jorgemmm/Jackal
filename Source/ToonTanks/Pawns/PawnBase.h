@@ -94,7 +94,7 @@ protected:
 	
 	//Variables
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<AProjectileBase> ProjectileClass;
+		TSubclassOf<AProjectileBase> ProjectileClassLv1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
 		AProjectileBase* Projectile;
@@ -136,9 +136,7 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void HealingMe(int Delta=10);
-
-	
+	void HealingMe(int Delta=10);	
 
 	
 
@@ -159,7 +157,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void Load();
 
-
-
+	
 
 };

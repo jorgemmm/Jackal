@@ -50,7 +50,13 @@ void APawnTurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!PlayerPawn || !PlayerPawn->GetPlayerAlive() || ReturnDistanceToPlayer() > FireRange)
+	if (!PlayerPawn)
+	{
+		//PlayerPawn = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+		//if (!PlayerPawn)
+		return;
+	}
+	if (!PlayerPawn->GetPlayerAlive() || ReturnDistanceToPlayer() > FireRange)
 	{
 		return;
 	}

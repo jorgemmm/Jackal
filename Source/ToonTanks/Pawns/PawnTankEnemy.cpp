@@ -159,8 +159,11 @@ float APawnTankEnemy::ReturnDistanceToPlayer()
 	float Distance = Super::ReturnDistanceToPlayer();
 	// Check if we have a valid reference to the player.
 	
+
+
 	if (!PlayerPawn || !PlayerPawn->GetPlayerAlive())
 	{
+		UE_LOG(LogTemp, Error, TEXT("APawnTankEnemy.CPP ReturnDistanceToPlayer PlayerControllerRef is nullptr"));
 		return 0.0f;
 	}
 

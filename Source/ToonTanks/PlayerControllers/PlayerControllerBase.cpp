@@ -10,6 +10,11 @@
 
 void APlayerControllerBase::SetPlayerEnabledState(bool SetPlayerEnabled)
 {
+	if(!GetPawn())
+	{  
+		UE_LOG(LogTemp, Error, TEXT("GI.SetPlayerEnabledState PlayerPawn not Found or none"));
+		return;
+	}
 	if (SetPlayerEnabled)
 	{
 		GetPawn()->EnableInput(this);

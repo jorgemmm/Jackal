@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿   // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PawnBase.h"
 //#include "ToonTanks/Pawns/PawnBase.h"
@@ -49,8 +49,7 @@ APawnBase::APawnBase()
 	RootComponent = DefaultSceneRoot;*/
 
 	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));	
-	RootComponent = GetCapsule();
-	//CapsuleComp->SetupAttachment(RootComponent);
+	RootComponent = GetCapsule();	
 	CapsuleComp->SetCollisionProfileName(TEXT("Pawn"));
 	//CapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	//CapsuleComp->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
@@ -58,8 +57,8 @@ APawnBase::APawnBase()
 
 	
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
-	BaseMesh->SetupAttachment(RootComponent);
-	//BaseMesh->SetupAttachment(CapsuleComp);
+	//BaseMesh->SetupAttachment(RootComponent);
+	BaseMesh->SetupAttachment(CapsuleComp);
 	
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
 	TurretMesh->SetupAttachment(GetBaseMesh());
@@ -107,15 +106,12 @@ void APawnBase::PawnDestroyed()
 
 void APawnBase::RotateTurret(FVector LookAtTarget)
 {
+
 	//update TurretMesh to face the LookAtTarget passed in from the child Class
 	// TurretMesh->SetWorldRotation()...
 	// Find Rotation value to look at. Rot Start  pos x e y del target y z de la torreta
 	
 	FVector StartLocation = TurretMesh->GetComponentLocation();
-
-
-
-	
 	
 	
 
@@ -165,7 +161,7 @@ void APawnBase::Fire()
 	// Get ProjectileSpawnPoint Location && Rotation -> Spawn Projectile class
 	//at Location towards Rotation. 
 
-	if (!ProjectileClass)
+	if (!ProjectileClassLv1)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Could not Fire!!... Projectile Base is NONE"));
 
@@ -183,7 +179,7 @@ void APawnBase::Fire()
 		//AProjectileBase* TempProjectile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotator);
 		//TempProjectile->SetOwner(this);
 		
-		AProjectileBase* ProjectileLv1 = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, ProjectileSpawnLocation, ProjectileSpawnRotator);
+		AProjectileBase* ProjectileLv1 = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClassLv1, ProjectileSpawnLocation, ProjectileSpawnRotator);
 		
 		ProjectileLv1->SetOwner(this);
 

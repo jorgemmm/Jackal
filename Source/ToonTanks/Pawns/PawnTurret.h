@@ -50,6 +50,8 @@ public:
 	//Change override in child class: if enemy tank
 	virtual float ReturnDistanceToPlayer();
 
+
+
 private:
 	
 	/**Disparo cada FireRate segundos*/
@@ -74,6 +76,7 @@ protected:
 
 	//float ReturnDistanceToPlayer();
 
+	/**Distance to start shooting, if Player iS in Ranged Then Fire, Projectiles have Real Range*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 		float FireRange = 500.0f;
 	

@@ -87,7 +87,7 @@ void ARescueZone::OnOverBegin_EvacStart(UPrimitiveComponent* HitComp, AActor* Ot
 		//if (!PlayerPawn)
 		if (!PlayerPawn)
 		{
-			
+			//Los drones
 			UE_LOG(LogTemp, Error, TEXT("At RescueZone  OnOverBegin Pawn is not Founded or is nullptr"));
 			return;
 		}
@@ -130,33 +130,50 @@ void ARescueZone::OnOverBegin_EvacStart(UPrimitiveComponent* HitComp, AActor* Ot
 		}
 
 		
-		
-
-		SpawnMissing(); // nada más llegas descargamos a uno
-		PlayerPawn->SetMissingInAction(-1);
-		
-		FTimerHandle TimerSpawnHandler;
-
-		//if (TotalMissings > 0) {
-		if (PlayerPawn->GetMissingInAction() > 0) {
-			
-
+		while (PlayerPawn->GetMissingInAction() > 0)
+		{
+			SpawnMissing(); // nada más llegas descargamos a uno
 			PlayerPawn->SetMissingInAction(-1);
 
-			GetWorld()->GetTimerManager().SetTimer(
+			/*GetWorld()->GetTimerManager().SetTimer(
 				TimerSpawnHandler,
 				this,
 				&ARescueZone::SpawnMissing,
-				0.5f
+				1.5f,
+				false);*/
+		}
+
+		//GetWorld()->GetTimerManager().ClearTimer(TimerSpawnHandler);
+		//se ejecuta 1 vez
+		//SpawnMissing(); // nada más llegas descargamos a uno
+		//PlayerPawn->SetMissingInAction(-1);
+		
+		/*
+
+		if (TotalMissings > 0) {
+		if (PlayerPawn->GetMissingInAction() > 0) {
+			
+		//Esto seolo se ejecuta una vez
+			//PlayerPawn->SetMissingInAction(-1);
+
+		GetWorld()->GetTimerManager().SetTimer(
+				TimerSpawnHandler,
+				this,
+				&ARescueZone::SpawnMissing,
+				1.5f,
+				false		
+
+
 			);
 
-			PlayerPawn->SetMissingInAction(-1);
-		}
+			//PlayerPawn->SetMissingInAction(-1);
+		
 		else
 		{
 			GetWorld()->GetTimerManager().ClearTimer(TimerSpawnHandler);
 		}
-
+		*/
+		
 		PlayerPawn->Save();
 		
 
@@ -201,10 +218,7 @@ void ARescueZone::OnOverEnd_Player(class UPrimitiveComponent* OverlappedComp, cl
 			&APawnTank::ResetIsInZoneRescue,
 			//&ARescueZone::ResetPlayer,
 			5.0f
-			);
-
-
-			
+			);			
 		  
 	}
 }
@@ -227,6 +241,28 @@ void ARescueZone::OnOverBegin_EvacEnd(UPrimitiveComponent* HitComp, AActor* Othe
 		}
 
 		
+		
+		//Es más eficeciente así probar
+		// 
+		//APawnMissingCombat*  PawnExtraction = Cast<APawnMissingCombat>(OtherActor);
+		//if (!PawnExtraction)
+		//{
+		//	return;
+		//}
+		////Score
+		//if (!GameModeRef)
+		//{
+		//	UE_LOG(LogTemp, Error, TEXT("ARescueZone has no reference to the GameMode Not score updated"));
+		//	return;
+
+		//}
+		//if (!PawnExtraction)
+		//{
+		//	UE_LOG(LogTemp, Error, TEXT("Casting APawnMissingCombat Failing in ARescueZone "));
+		//	return;
+		//}
+		//GameModeRef->ActorDied(PawnExtraction); 
+
 		TArray<AActor*> FoundActors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawnMissingCombat::StaticClass(), OUT FoundActors);
 
@@ -234,22 +270,27 @@ void ARescueZone::OnOverBegin_EvacEnd(UPrimitiveComponent* HitComp, AActor* Othe
 		{
 
 			//APawnMissingCombat* PawnExtraction = Cast<APawnMissingCombat>(OtherActor);
-			APawnMissingCombat* PawnExtraction = Cast<APawnMissingCombat>(Actor);
+			APawnMissingCombat* PawnInMap = Cast<APawnMissingCombat>(Actor);
 
-
-			//Score
-			if (!GameModeRef)
+			if (PawnInMap == OtherActor) //Explicar en Twitch que faltaba esta línea
 			{
-				UE_LOG(LogTemp, Error, TEXT("ARescueZone has no reference to the GameMode Not score updated"));
-				return;
+				//Score
+				if (!GameModeRef)
+				{
+					UE_LOG(LogTemp, Error, TEXT("ARescueZone has no reference to the GameMode Not score updated"));
+					return;
 
+				}
+				if (!PawnInMap)
+				{
+					UE_LOG(LogTemp, Error, TEXT("Casting APawnMissingCombat Failing in ARescueZone "));
+					return;
+				}
+				GameModeRef->ActorDied(PawnInMap); //Actor->Destroy();
 			}
-			if (!PawnExtraction) 
-			{
-				UE_LOG(LogTemp, Error, TEXT("Casting APawnMissingCombat Failing in ARescueZone "));
-				return;
-			}
-			GameModeRef->ActorDied(PawnExtraction); //Actor->Destroy();
+
+			
+		
 			
 
 			//PawnExtraction->HandleDestruction(); Mejor en Game Mode (Encargado de spawn y destroy actor)
@@ -289,8 +330,7 @@ void ARescueZone::SpawnMissing()
 	} 
 	       
 			//Vector  PawnMissingSpawnLocation = PlayerPlayer->GetBaseMesh()->GetComponentLocation();
-			FVector  PawnMissingSpawnLocation = GetExtractionShipMesh()->GetComponentLocation();
-			FRotator PawnMissingSpawnRotator  = GetExtractionShipMesh()->GetComponentRotation();
+			
 
 			
 			// Set the spawn parameters
@@ -299,15 +339,16 @@ void ARescueZone::SpawnMissing()
 			SpawnParams.Owner = this;
 			SpawnParams.Instigator = GetInstigator();
 
-			float x = FMath::RandRange(100.f, +300.f);
-			float y = FMath::RandRange(-100.f, -300.f);
+			const float x = FMath::RandRange(100.f, +400.f);
+			const float y = FMath::RandRange(-100.f, -400.f);
 
-			if(x < 120)  x = FMath::RandRange(-100.f, -300.f);
-			if(y > -120) y = FMath::RandRange(100.f, +300.f);
+			//if(x < 120)  x = FMath::RandRange(-100.f, -300.f);
+			//if(y > -120) y = FMath::RandRange(100.f, +300.f);
 
-
+			const FVector  PawnMissingSpawnLocation = GetExtractionShipMesh()->GetComponentLocation() + FVector(x, y, 100.f);
+			const FRotator PawnMissingSpawnRotator  = GetExtractionShipMesh()->GetComponentRotation()+FRotator (0.f,0.f,(x+y)/10);;
 			//PawnMissingSpawnLocation += FVector(x, y, 100.f);
-			PawnMissingSpawnLocation += FVector(200.f, 200.f, 100.f);
+			//PawnMissingSpawnLocation += FVector(200.f, 200.f, 100.f);
 			//PawnMissingSpawnRotator += FRotator(x / 2, y / 2, 0.f);
 
 			
@@ -331,6 +372,9 @@ void ARescueZone::SpawnMissing()
 			
 			    
 			MissingInActions.Emplace(PawnMissed);
+
+			
+			
 
 
 }

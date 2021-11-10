@@ -36,6 +36,7 @@
 APawnTank::APawnTank()
 {
 
+	
 
 	//RootComponent = GetCapsule();
 	
@@ -61,7 +62,7 @@ APawnTank::APawnTank()
 	TurretCamera->SetupAttachment(TurretSpringArm);
 	TurretCamera->Activate(false);
 
-
+	
 	
 	
 }
@@ -84,38 +85,18 @@ void APawnTank::BeginPlay()
 
 
 
-void APawnTank::ChangeCameraView(bool bInBaseRoot)
-{
-	//default false 
-	Camera->Activate(false);
-	TurretCamera->Activate(false);
-
-	
-
-	if (bInBaseRoot) 
-	{ 
-		
-		
-		Camera->Activate(true);
-		
-	}
-	else
-	{
-		
-		
-		TurretCamera->Activate(true);
-		
-
-	}
-
-
-}
-
-
 // Called every frame
 void APawnTank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//PlayerControllerRef = Cast<APlayerController>(GetController());
+	if (!PlayerControllerRef)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PawnTank.CPP tick PlayerControllerRef is nullptr"));
+		return;
+	}
+		
 
 	Rotate();
 	Move();
@@ -183,9 +164,7 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 
 	
-	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);	
-	
-	
+	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);
 	PlayerInputComponent->BindAxis("TurnRight", this, &APawnTank::CalculateRotateInput);
 	
 	//Mirar gomvo`para configurar en opciones distintas entradas.
@@ -202,8 +181,7 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	
 	
 	
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);
-	
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);	
 	//PlayerInputComponent->BindAction("Turbo", IE_Pressed, &APawnTank::Turbo);
 
 }
@@ -312,7 +290,7 @@ void APawnTank::Fire()
 		UE_LOG(LogTemp, Warning, TEXT("Arma sobrecalentada"));
 
 		CoolDown();
-		IsCoolDown();
+		IsCoolDown();  //Evento blueprint
 		return;
 	}
 
@@ -326,13 +304,19 @@ void APawnTank::Fire()
 
 	IsJustFiring();
 
-	if (GetMissingInAction() >= GetMaxPassenger())
+
+
+	if (GetMissingInAction() >= GetMaxPassenger() || bisTygerTank)
 	{
 		if (!ProjectileClassLv3)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Could not Fire!!... ProjectileClassLv3 is NONE"));
 			return;
 		}
+
+		
+
+		IsJustFiringLv3(); 
 
 		FVector  ProjectileSpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
 		FRotator ProjectileSpawnRotator = ProjectileSpawnPoint->GetComponentRotation();
@@ -342,12 +326,13 @@ void APawnTank::Fire()
 		ProjectileLv3->SetOwner(this);
 
 		Temperatura+=2.f;
-		
+		FString TempMessage = FString::Printf(TEXT(" Projectile Level 3: You Temperature now is %f "), Temperatura);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);
 
 		return;
 	}
 
-	if ( GetMissingInAction() >= GetMaxPassenger() / 2)
+	if ( GetMissingInAction() >= GetMaxPassenger() / 2 || bisByshopTank)
 	{
 
 		if (!ProjectileClassLv2)
@@ -356,30 +341,41 @@ void APawnTank::Fire()
 			return;
 		}
 		
-			FVector  ProjectileSpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
-			FRotator ProjectileSpawnRotator = ProjectileSpawnPoint->GetComponentRotation();
+		IsJustFiringLv2();
+
+		FVector  ProjectileSpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+		FRotator ProjectileSpawnRotator = ProjectileSpawnPoint->GetComponentRotation();
 			
 
-			AProjectileBase* ProjectileLv2 = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClassLv2, ProjectileSpawnLocation, ProjectileSpawnRotator);
-			UE_LOG(LogTemp, Warning, TEXT("Fire!!... ProjectileClassLv2 "));
-			ProjectileLv2->SetOwner(this);
+		AProjectileBase* ProjectileLv2 = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClassLv2, ProjectileSpawnLocation, ProjectileSpawnRotator);
+		UE_LOG(LogTemp, Warning, TEXT("Fire!!... ProjectileClassLv2 "));
+		ProjectileLv2->SetOwner(this);
 			
-			Temperatura++;
+		Temperatura++;
 
-			return;
+		FString TempMessage = FString::Printf(TEXT(" Projectile Level 2: You Temperature now is %f "), Temperatura);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);
+
+		return;
 		
 	}
 
 	
 	Super::Fire();
 	
-	
+	FString TempMessage = FString::Printf(TEXT(" Projectile Level 1: You Temperature now is %f "), Temperatura);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);
 }
+
+
 
 int32 APawnTank::GetMissingInAction() const
 {
 	return MissingInActions;
 }
+
+
+
 
 void APawnTank::SetMissingInAction(int32 NewRescued)
 {
@@ -444,6 +440,62 @@ void APawnTank::ResetIsInZoneRescue()
 	//GetCapsule()->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 
 }
+
+
+
+void APawnTank::ChangeCameraView(bool bInBaseRoot)
+{
+	//default false 
+	Camera->Activate(false);
+	TurretCamera->Activate(false);
+
+
+
+	if (bInBaseRoot)
+	{
+
+
+		Camera->Activate(true);
+
+	}
+	else
+	{
+
+
+		TurretCamera->Activate(true);
+
+
+	}
+
+
+}
+
+
+void APawnTank::UpdateHeroSetting(float TMAX, float move, float rotate)
+{
+	TempMax = TMAX;
+	MoveSpeed = move;
+	RotateSpeed = rotate;
+}
+
+void APawnTank::SetTyger(bool newValue)
+{
+	bisTygerTank = newValue;
+}
+
+void APawnTank::SetByshop(bool newValue)
+{
+	bisByshopTank = newValue;
+}
+
+void APawnTank::SetPanther(bool newValue)
+{
+	bisPantherTank = newValue;
+}
+
+
+
+
 
 
 

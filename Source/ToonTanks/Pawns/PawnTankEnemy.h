@@ -51,7 +51,7 @@ private:
 	FRotator RotateBase(FVector LookAtTarget);
 	
 	
-
+	/**Distance To stop and ready to shot: when target is at FireRange*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 		float DistToShoot = 1000.0f;
 

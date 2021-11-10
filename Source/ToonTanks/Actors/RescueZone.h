@@ -53,7 +53,7 @@ private:
 
 	void SpawnMissing();
 
-	
+	FTimerHandle TimerSpawnHandler;
 
 public:	
 

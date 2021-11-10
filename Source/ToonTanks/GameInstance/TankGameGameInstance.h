@@ -26,13 +26,24 @@ private:
 
 	int32 MissinInActionRescued;
 
+	
+
+	int32 GI_Score;
+
 	//int32 MissigInActionTransported;
 
 protected:
 
 public:
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Game Loop")//, meta = (AllowPrivateAccess = "true"))
+		FString StartLevel = TEXT("Level1");
+
 	void UpdateLevelID();
+
+	void UpdateLevelID(int32 Delta);
+
+	void UpdateScore(int32 Delta);
 
 	UFUNCTION(BlueprintPure)
 	int32 GetMissingInActionRescued() const;
@@ -42,6 +53,13 @@ public:
 
 	//int32 GetMissigInActionTransported() const;
 
+	UFUNCTION(BlueprintPure)
+		int32 GetGI_Score() const;
 
-	
+
+
+
+
+
+
 };

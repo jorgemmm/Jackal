@@ -176,6 +176,8 @@ void APawnMissingCombat::Tick(float DeltaTime)
 float APawnMissingCombat::ReturnDistanceToPlayer()
 {
 	// Check if we have a valid reference to the player.
+	
+	
 	if (!PlayerPawn || !PlayerPawn->GetPlayerAlive())
 	{
 		UE_LOG(LogTemp, Error, TEXT("PlayerPawn Not loade or none"));
@@ -339,11 +341,13 @@ void APawnMissingCombat::OnBOver_Rescue(UPrimitiveComponent* HitComp, AActor* Ot
 			Player->Save();  // upgrade the missil 
 			
 							//Aumento Score
-			//ATankGameModeBase* GameMode = Cast<ATankGameModeBase>( UGameplayStatics::GetGameMode(GetWorld()) );
+			ATankGameModeBase* GameMode = Cast<ATankGameModeBase>( UGameplayStatics::GetGameMode(GetWorld()) );
 			
-			Player->GetPureHealthComponent()->GameModeRef->SetScore(5);
-			//GameMode->SetScore(5);
-
+			//Player->GetPureHealthComponent()->GameModeRef->SetScore(5);
+			if(GameMode!=nullptr)
+				GameMode->SetScore(5);
+			else 
+				UE_LOG(LogTemp, Error, TEXT("Game mode is nulptr or none"));
 
 			//ShowFX();
 			//K2_DestroyActor();

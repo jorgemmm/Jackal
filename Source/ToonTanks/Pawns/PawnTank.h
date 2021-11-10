@@ -60,6 +60,12 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void IsJustFiring();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void IsJustFiringLv2();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void IsJustFiringLv3();
 
 private:
 
@@ -69,9 +75,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components",	meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
 
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* TurretSpringArm;
 
+	
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* TurretCamera;
 
@@ -111,6 +120,8 @@ private:
 	/**Indica si estamos en zona de recate*/
 	bool bIsInZoneRescue = false;
 
+
+
 	void CalculateMoveInput(float Value);
 	void CalculateRotateInput(float Value);
 
@@ -119,8 +130,11 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hero Settings", meta = (AllowPrivateAccess = "true"))
 	float Temperatura;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hero Settings", meta = (AllowPrivateAccess = "true"))
-	float TempMax=75;
+	float TempMax = 75;
+	
+	//Fx CoolDown Particle and sound
 	void CoolDown();
 	
 	
@@ -141,6 +155,17 @@ private:
 
 	virtual void Fire() override;
 
+	/*Mejor disparo que jackal y peor movilidad y peor calentamiento*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IAP", meta = (AllowPrivateAccess = "true"))
+		bool bisTygerTank;
+	/*Mejor disparo que jackal, mejor movilidad y mucho peor calentamiento*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IAP", meta = (AllowPrivateAccess = "true"))
+		bool bisByshopTank;	
+
+	//Mismo disparo que jackal pero mejor movilidad
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IAP", meta = (AllowPrivateAccess = "true"))
+		bool bisPantherTank;
+
 	
 
 	//Menú opciones con gonvo
@@ -160,17 +185,14 @@ public:
 		int32 GetMissingInAction() const;
 	
 	
-	
 
 	UFUNCTION(BlueprintCallable)
 		void SetMissingInAction(int32 NewRescued);
-
 	
 
 	
 	UFUNCTION(BlueprintPure)
 		int32 GetMaxPassenger() const;
-
 	
 
 	/**Indica si estamos en zona de recate*/
@@ -194,6 +216,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeCameraView(bool bInBaseRoot);
 
-	
+	/* Customize tmax value and speed value for purchased tanks*/
+	UFUNCTION(BlueprintCallable ,meta = (DisplayName = "Customize Tank", CompactNodeTitle = "Update Tank", Keywords = "Update Hero Settings"), Category = Game)
+		void UpdateHeroSetting(float TMAX, 	float move, float rotate);
+
+
+	/*Establece si tenemos ya un tyger*/
+	UFUNCTION(BlueprintCallable)
+		void SetTyger(bool newValue);
+	/*Establece si tenemos ya un Byshop*/
+	UFUNCTION(BlueprintCallable)
+		void SetByshop(bool newValue);
+	/*Establece si tenemos ya un Panther*/
+	UFUNCTION(BlueprintCallable)
+		void SetPanther(bool newValue);
 
 };
