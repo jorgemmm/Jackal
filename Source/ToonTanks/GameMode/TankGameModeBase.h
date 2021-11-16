@@ -39,14 +39,23 @@ private:
 	TArray<int32> DroneLevel;// [] 
 
 	int32 TargetTurrets = 0;
-	int32 MissinInActions = 0;
+	
+	int32 SpawnPointId=0;
+	
+	/*Missing in Actions in Map; you have to search it*/
 	int32 MissingRequired=0;
+
+	/*Missing in actions rescued; when equal MissingRquired Mission is Success*/
+	int32 MissinInActions = 0;
 
 	APlayerControllerBase* PlayerControllerRef;
 
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(visibleAnywhere, BlueprintReadOnly, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
 	APawnTank* PlayerTank;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<APawnTank> HeroTankClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
 		int StartDelay = 3;
@@ -60,14 +69,12 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
 		TArray<FString> LevelNames; 
-	
+	/* Num máx de drons in Level Min=Max/10**/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
-		TArray<int32> MissingInActionsByLevel;	
-	
-	
+		int32 NumMaxDronsInMap = 36;
 
-	void DelayToStart();//Deprecated
-	void EnableController();//Deprecated
+	void DelayToStart();
+	void EnableController();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
 	int32 Score =0;
@@ -84,6 +91,20 @@ public:
 	void ActorDied(AActor* DeadActor);
 	void HandleMision();
 	
+
+	
+	
+	/**Llamma a esta función cada vez que llegues a una zona de evacuación*/
+	UFUNCTION(BlueprintCallable)
+		void AddSpawnPointId();
+
+	UFUNCTION(BlueprintPure)
+	int32 GetSpawnPointId() const;
+
+
+	UFUNCTION(BlueprintCallable)
+		void SetMissingRequired();
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void GameStart();
 	
@@ -96,6 +117,12 @@ public:
 	int32 GetTargetTurretCount() const;
 
 	UFUNCTION(BlueprintPure)
+	int32 GetMissingInMap() const;
+
+	UFUNCTION(BlueprintPure)
+		int32 GetMaxMissingInMap() const;
+
+	UFUNCTION(BlueprintPure)
 	int32 GetScore() const;
 
 	UFUNCTION(BlueprintPure)
@@ -103,17 +130,22 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	int32 GetMissingRequired() const;
-	
 
-	UFUNCTION(BlueprintPure)
-		int32 GetMissingInMap() const;
-
-	UFUNCTION(BlueprintCallable)
-		void SetMissingRequired();
-	
-	
 
 	UFUNCTION(BlueprintCallable)
 	void SetScore(int32 Delta);
+
+
+
+/*Deprected delete or evaluation*/
+	/** No en uso para esta lógica*/
+	UFUNCTION(BlueprintCallable)
+	void ReSpawn();
+	
+	/*
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Loop", meta = (AllowPrivateAccess = "true"))
+		TArray<int32> MissingInAcRequiredByLevel;
+		*/
+
 	
 };

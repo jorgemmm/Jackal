@@ -75,16 +75,16 @@ void APawnTurret::CheckFireCondition()
 
 	if (!PlayerPawn || !PlayerPawn->GetPlayerAlive())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No Detecto a al palyerpawn in PawnTurret"));
+		UE_LOG(LogTemp, Error, TEXT("No Detecto a al palyerpawn in PawnTurret"));
 		return;	
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Detecto a al palyerpawn  %s "), *PlayerPawn->GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("Detectado playerpawn  %s "), *PlayerPawn->GetName());
 
 	//if Player Player  IS in Ranged Then Fire!!
 	if (ReturnDistanceToPlayer() <= FireRange)
 	{
 		// Fire
-		UE_LOG(LogTemp, Warning, TEXT("FIRE!!"));
+		//UE_LOG(LogTemp, Warning, TEXT("FIRE!!"));
 		Fire();
 	}
 

@@ -174,6 +174,9 @@ void ARescueZone::OnOverBegin_EvacStart(UPrimitiveComponent* HitComp, AActor* Ot
 		}
 		*/
 		
+
+		GameModeRef->AddSpawnPointId();
+		
 		PlayerPawn->Save();
 		
 

@@ -68,7 +68,7 @@ public:
 	UFUNCTION()
 	 void OnOverBegin_EvacStart(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
 
-	//Segunda de la maniobra de extracción
+	//Fin de la maniobra de extracción
 	UFUNCTION()
 	 void OnOverBegin_EvacEnd(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
 

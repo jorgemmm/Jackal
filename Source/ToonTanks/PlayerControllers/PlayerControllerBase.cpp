@@ -26,6 +26,7 @@ void APlayerControllerBase::SetPlayerEnabledState(bool SetPlayerEnabled)
 		//bShowMouseCursor = false;
 	}
 
+
 	bShowMouseCursor = SetPlayerEnabled;
 
 	bEnableMouseOverEvents = SetPlayerEnabled;

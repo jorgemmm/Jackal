@@ -231,7 +231,7 @@ void APawnTank::Move()
 	FHitResult Hit;
 	
 	//GetCapsule()->AddLocalOffset(MoveDirection, true, &Hit);
-	AddActorLocalOffset(MoveDirection, true, &Hit);
+	AddActorLocalOffset(MoveDirection,true, &Hit);
 	
 	if (Hit.IsValidBlockingHit())
 	{
@@ -300,7 +300,7 @@ void APawnTank::Fire()
 	if (Temperatura >= TempMax)bIsCooldown = true;
 	else bIsCooldown = false;
 
-	UE_LOG(LogTemp, Error, TEXT("Temperatura: %f"), Temperatura);
+	//UE_LOG(LogTemp, Warning, TEXT("Temperatura: %f"), Temperatura);
 
 	IsJustFiring();
 
@@ -322,7 +322,7 @@ void APawnTank::Fire()
 		FRotator ProjectileSpawnRotator = ProjectileSpawnPoint->GetComponentRotation();
 
 		AProjectileBase* ProjectileLv3 = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClassLv3, ProjectileSpawnLocation, ProjectileSpawnRotator);
-		UE_LOG(LogTemp, Warning, TEXT("Fire!!... ProjectileClassLv3 "));
+		//UE_LOG(LogTemp, Warning, TEXT("Fire!!... ProjectileClassLv3 "));
 		ProjectileLv3->SetOwner(this);
 
 		Temperatura+=2.f;
@@ -348,7 +348,7 @@ void APawnTank::Fire()
 			
 
 		AProjectileBase* ProjectileLv2 = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClassLv2, ProjectileSpawnLocation, ProjectileSpawnRotator);
-		UE_LOG(LogTemp, Warning, TEXT("Fire!!... ProjectileClassLv2 "));
+		//UE_LOG(LogTemp, Warning, TEXT("Fire!!... ProjectileClassLv2 "));
 		ProjectileLv2->SetOwner(this);
 			
 		Temperatura++;
