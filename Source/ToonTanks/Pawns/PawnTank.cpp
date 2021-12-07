@@ -287,7 +287,7 @@ void APawnTank::Fire()
 	if (bIsCooldown)
 	{
 	 
-		UE_LOG(LogTemp, Warning, TEXT("Arma sobrecalentada"));
+		//UE_LOG(LogTemp, Warning, TEXT("Arma sobrecalentada"));
 
 		CoolDown();
 		IsCoolDown();  //Evento blueprint
@@ -326,8 +326,8 @@ void APawnTank::Fire()
 		ProjectileLv3->SetOwner(this);
 
 		Temperatura+=2.f;
-		FString TempMessage = FString::Printf(TEXT(" Projectile Level 3: You Temperature now is %f "), Temperatura);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);
+		//FString TempMessage = FString::Printf(TEXT(" Projectile Level 3: You Temperature now is %f "), Temperatura);
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);
 
 		return;
 	}
@@ -353,8 +353,8 @@ void APawnTank::Fire()
 			
 		Temperatura++;
 
-		FString TempMessage = FString::Printf(TEXT(" Projectile Level 2: You Temperature now is %f "), Temperatura);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);
+		/*FString TempMessage = FString::Printf(TEXT(" Projectile Level 2: You Temperature now is %f "), Temperatura);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);*/
 
 		return;
 		
@@ -363,8 +363,8 @@ void APawnTank::Fire()
 	
 	Super::Fire();
 	
-	FString TempMessage = FString::Printf(TEXT(" Projectile Level 1: You Temperature now is %f "), Temperatura);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);
+	/*FString TempMessage = FString::Printf(TEXT(" Projectile Level 1: You Temperature now is %f "), Temperatura);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);*/
 }
 
 
