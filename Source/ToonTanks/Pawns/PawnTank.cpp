@@ -232,18 +232,20 @@ void APawnTank::Move()
 	
 	//GetCapsule()->AddLocalOffset(MoveDirection, true, &Hit);
 	AddActorLocalOffset(MoveDirection,true, &Hit);
+	//AddActorWorldOffset(MoveDirection, true);
 	
 	if (Hit.IsValidBlockingHit())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Algo ha bloqueado al PawnTank"));
+		//UE_LOG(LogTemp, Warning, TEXT("Algo ha bloqueado al PawnTank"));
 		MoveDirection = FVector::ZeroVector;
-		UE_LOG(LogTemp, Warning, TEXT("MoveDirection: %f "), MoveDirection.Size());
+		//UE_LOG(LogTemp, Warning, TEXT("MoveDirection: %f "), MoveDirection.Size());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Nada Bloquea al PawnTank"));
+		//UE_LOG(LogTemp, Warning, TEXT("Nada Bloquea al PawnTank"));
 	}
-	//AddActorWorldOffset(MoveDirection, true);
+	
+	
 }
 
 void APawnTank::Rotate()
@@ -409,7 +411,7 @@ void APawnTank::HandleDestruction()
 
 }
 
-
+/* if bIsInZoneRescue equal true show Player Pawn Is RescueZone - > PNJ Drones doesn´t move and Player Pawn doesnt take any drones*/
 bool APawnTank::GetIsInZoneRescue() const
 {
 	return bIsInZoneRescue;
@@ -422,22 +424,22 @@ float APawnTank::GetTemperatura() const
 	return Temperatura;
 }
 
-
+/*Set bIsInZoneRescue to true =>  Player Pawn Is at RescueZone - >PNJ Drones doesn´t move and Player Pawn doesnt take any drones; */
 void APawnTank::SetIsInZoneRescue()
 {
 
 	bIsInZoneRescue= true;	
-	//GetCapsule()->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));	
+	//GetCapsule()->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));	//Debug
 
 }
 
-
+/*Set bIsInZoneRescue to false =>  Player Pawn Is not at RescueZone- >PNJ Drones can move to nearest target (PlayerPawn or rescueZone ) or waiting to Player pawn
+and Player Pawn could take drones*/
 void APawnTank::ResetIsInZoneRescue()
 {
 
 	bIsInZoneRescue = false;
-
-	//GetCapsule()->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	//GetCapsule()->SetCollisionProfileName(TEXT("OverlapAllDynamic")); //Debug
 
 }
 

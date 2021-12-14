@@ -58,11 +58,11 @@ void APawnTankEnemy::Tick(float DeltaTime)
 
 	if ( !PlayerPawn || !PlayerPawn->GetPlayerAlive() ) 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No Detecto a al palyerpawn in PawnTurret"));
+		UE_LOG(LogTemp, Error, TEXT("No Detecto a al palyerpawn in PawnTurret"));
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Enemy Tank Move Dist : %f"), ReturnDistanceToPlayer());
+	//UE_LOG(LogTemp, Warning, TEXT("Enemy Tank Move Dist : %f"), ReturnDistanceToPlayer());
 
 	if (ReturnDistanceToPlayer() < DistToShoot)
 	{
@@ -86,12 +86,11 @@ void APawnTankEnemy::Tick(float DeltaTime)
 	if (ReturnDistanceToPlayer() >= DistToShoot)
 	{		
 		//GetActorLocation() no funciona porque capsule no tiene componente Location
-		// debes coger el basemesh
+		//debes coger el basemesh
 		//Lo mismo con player Pawn da problemas en el tick para coger el actor location
 		//UE_LOG(LogTemp, Error, TEXT("Enemy tank go From: %s to:  %s "),*GetBaseMesh()->GetComponentLocation().ToCompactString(), *PlayerPawn->GetBaseMesh()->GetComponentLocation().ToCompactString());
-				
-		/*UE_LOG(LogTemp, Error, TEXT("To: %s "),
-			*PlayerPawn->GetActorLocation().ToString());*/
+		//UE_LOG(LogTemp, Error, TEXT("To: %s "),
+		//*PlayerPawn->GetActorLocation().ToString());*/
 		
 		FHitResult Hit;
 		

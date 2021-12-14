@@ -14,6 +14,7 @@
 #include "ToonTanks/Pawns/PawnMissingCombat.h"
 
 #include "ToonTanks/Actors/TargetSpawn.h"
+#include "ToonTanks/Actors/GulagZone.h"
 
 #include "ToonTanks/PlayerControllers/PlayerControllerBase.h"
 
@@ -95,7 +96,7 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("A EnemyPawn Died"));
 			
-			//DestroyedTurret->HandleDestruction();
+			
 			DestroyedTurret->PawnDestroyed();
 
 			Score += 5;
@@ -106,12 +107,10 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
 			
 			//HandleMisionRequired(); Deprec delete
 
-		}
-		
-		if (APawnMissingCombat* MissigInAction = Cast<APawnMissingCombat>(DeadActor))
+		}else if (APawnMissingCombat* MissigInAction = Cast<APawnMissingCombat>(DeadActor))		
 		{
 			
-			//MissigInAction->HandleDestruction();
+			
 			MissigInAction->PawnDestroyed();
 			//Call from rescue zone
 			Score += 5;
@@ -122,7 +121,16 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
 			
 			
 			//HandleMisionRequired(); Deprec delete
+		}else if (AGulagZone* GulagZone = Cast<AGulagZone>(DeadActor))
+		{
+			//Spawn Effects, Unlesh drones, Destroy Gulag
+			GulagZone->GulagZoneDestroyed();
+			Score += 10;
+
+			UE_LOG(LogTemp, Warning, TEXT("Gulag Zone Destroyed "));
 		}
+
+		
 
 		
 
@@ -153,8 +161,8 @@ void ATankGameModeBase::HandleMision()
 /**Llamma a esta función cada vez que llegues a una zona de evacuación*/
 void ATankGameModeBase::AddSpawnPointId()
 {	
-	//No más de 3 puntos de Spawning.
-	SpawnPointId=FMath::Clamp(++SpawnPointId,0,3);
+	//No más de 4 puntos de Spawning.
+	SpawnPointId=FMath::Clamp(++SpawnPointId,0,4);
 }
 
 

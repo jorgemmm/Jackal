@@ -73,6 +73,14 @@ private:
 	//Activamos tick cuando player pawn llegue a la zona de evac
 	bool EvacFlag = false;
 
+	FTimerHandle TimerMissingHandler;
+
+	void FoundMissings();
+
+	void MissingDistanceHandler();
+
+	bool RescueZoneCloser = false;
+
 
 public:
 
@@ -98,22 +106,10 @@ public:
 		void OnBOver_Rescue(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
 	
 	
-	//Not in use
-	UFUNCTION()
-		void OnHit_Rescue(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	
 
 
-
-
-	UFUNCTION()
-		void OnOverlapBegin(class AActor* OverlappedActor, class AActor* OtherActor);
-
-
-	UFUNCTION()
-		void NotifyActorEndOverlap(AActor * OtherActor);
-
-	UFUNCTION()
-		void NotifyActorBeginOverlap(AActor * OtherActor);
+	
 
 	
 	
@@ -126,5 +122,17 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 		void SetEvacFlag(bool newFlag);
+
+
+	/** Use in Future */
+	UFUNCTION()
+		void NotifyActorEndOverlap(AActor* OtherActor);
+
+	UFUNCTION()
+		void NotifyActorBeginOverlap(AActor* OtherActor);
+
+
+
+	
 
 };

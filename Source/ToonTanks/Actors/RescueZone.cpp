@@ -45,8 +45,8 @@ ARescueZone::ARescueZone()
 	
 	
 	ExtractionShipMesh->SetCollisionProfileName(TEXT("BlockAllDynamic"));
-	ExtractionShipMesh->OnComponentBeginOverlap.AddDynamic(this, &ARescueZone::OnOverBegin_EvacEnd);
-	ExtractionShipMesh->OnComponentHit.AddDynamic(this, &ARescueZone::OnCompHit_EvacEnd);
+
+	
 
 
 	EvacZone = CreateDefaultSubobject<UBoxComponent>(TEXT("Rescue Zone"));
@@ -71,7 +71,7 @@ void ARescueZone::BeginPlay()
 }
 
 
-
+/**When Player Arrive Rescue Zone Spawn Drones: Drones get down from jackal*/
 void ARescueZone::OnOverBegin_EvacStart(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
 {
 
@@ -81,8 +81,7 @@ void ARescueZone::OnOverBegin_EvacStart(UPrimitiveComponent* HitComp, AActor* Ot
 	{
 		//If Overlap with Player Pawn
 		APawnTank* PlayerPawn = Cast<APawnTank>(OtherActor);
-		//Player = Cast<APawnTank>(OtherActor);
-		
+		//Player = Cast<APawnTank>(OtherActor);		
 
 		//if (!PlayerPawn)
 		if (!PlayerPawn)
@@ -187,6 +186,7 @@ void ARescueZone::OnOverBegin_EvacStart(UPrimitiveComponent* HitComp, AActor* Ot
 }
 
 
+/**After few secon jackal could take more drones out rescue zones*/
 void ARescueZone::OnOverEnd_Player(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 
@@ -227,7 +227,10 @@ void ARescueZone::OnOverEnd_Player(class UPrimitiveComponent* OverlappedComp, cl
 }
 
 
+//
 /**Repasar si produce crash*/
+/*==============   Esto debería ir en missing in action    ========================*/
+/**The dornes got to rescue zone more closed*/
 void ARescueZone::OnOverBegin_EvacEnd(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
 {
 	//Debes dcirle al missing in action in tick que si tiene un rescue zone más cerca de 300 
@@ -241,9 +244,7 @@ void ARescueZone::OnOverBegin_EvacEnd(UPrimitiveComponent* HitComp, AActor* Othe
 		if (PlayerPawn || Missil)
 		{
 			return;
-		}
-
-		
+		}		
 		
 		//Es más eficeciente así probar
 		// 
@@ -300,24 +301,21 @@ void ARescueZone::OnOverBegin_EvacEnd(UPrimitiveComponent* HitComp, AActor* Othe
 		}
 
 
+		GetWorld()->GetTimerManager().ClearTimer(TimerDestroyRescueZone);
+		GetWorld()->GetTimerManager().SetTimer(TimerDestroyRescueZone, this, &ARescueZone::HandleDestruction, 8.f);
+
+		    //GetWorld()->GetTimerManager().SetTimer(TimerDestroyRescueZone,
+			//	this,
+			//	Destroy(),
+			//	//&APawnTank::ResetIsInZoneRescue,
+			//	//&ARescueZone::ResetPlayer,
+			//	5.0f
+			//);
+		
 
 	}
 }
 
-
-
-//Debug only
-void ARescueZone::OnCompHit_EvacEnd(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	if (OtherActor && OtherActor != this)// && OtherComp)
-	{
-		//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I Hit: %s"), *OtherActor->GetName()));
-	
-	}
-
-
-
-}
 
 
 
@@ -342,14 +340,15 @@ void ARescueZone::SpawnMissing()
 			SpawnParams.Owner = this;
 			SpawnParams.Instigator = GetInstigator();
 
+			//const float Disper = DroneDispersion * 1.f;
+
 			const float x = FMath::RandRange(100.f, +400.f);
 			const float y = FMath::RandRange(-100.f, -400.f);
 
-			//if(x < 120)  x = FMath::RandRange(-100.f, -300.f);
-			//if(y > -120) y = FMath::RandRange(100.f, +300.f);
+			
 
 			const FVector  PawnMissingSpawnLocation = GetExtractionShipMesh()->GetComponentLocation() + FVector(x, y, 100.f);
-			const FRotator PawnMissingSpawnRotator  = GetExtractionShipMesh()->GetComponentRotation()+FRotator (0.f,0.f,(x+y)/10);;
+			const FRotator PawnMissingSpawnRotator  = GetExtractionShipMesh()->GetComponentRotation() + FRotator (0.f,0.f,(x+y)/10);;
 			//PawnMissingSpawnLocation += FVector(x, y, 100.f);
 			//PawnMissingSpawnLocation += FVector(200.f, 200.f, 100.f);
 			//PawnMissingSpawnRotator += FRotator(x / 2, y / 2, 0.f);
@@ -381,6 +380,21 @@ void ARescueZone::SpawnMissing()
 
 
 }
+
+void ARescueZone::HandleDestruction()
+{
+	NiagaraStart();
+
+	UGameplayStatics::PlaySoundAtLocation(this, DestructionSound, GetActorLocation());
+
+	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(DeathShake);
+
+	Destroy();
+
+	
+}
+
+
 
 
 

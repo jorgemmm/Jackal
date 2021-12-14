@@ -140,9 +140,9 @@ public:
 
 	
 
-
-	UFUNCTION(BlueprintPure)
-		UHealthComponent* GetPureHealthComponent() const;
+	//Pure no se pueden sobreescribir
+	UFUNCTION(BlueprintPure) 
+	UHealthComponent* GetPureHealthComponent() const;
 
 
 	UFUNCTION(BlueprintCallable)

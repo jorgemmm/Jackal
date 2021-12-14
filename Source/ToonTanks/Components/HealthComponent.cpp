@@ -182,15 +182,26 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 		//if(PlayerPawn) 
 		Health = FMath::Clamp(Health - Damage, 0.f, DefaultHealth);
 	}
+	else if (  Owner->ActorHasTag(TEXT("gulag")) || Owner->ActorHasTag(TEXT("carcel"))  )
+	{
+		//Actores que sin tags 
+
+		float AmountDamage = Health - 2*Damage;
+
+		Health = FMath::Clamp(AmountDamage, 0.f, DefaultHealth);
+		
+	
+		
+	}
 	
 
 	
 	
-	UE_LOG(LogTemp, Warning, TEXT("Pawn: %s"), *Owner->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("Actor or Pawn: %s"), *Owner->GetName());
 	UE_LOG(LogTemp, Warning, TEXT("Left Following Health: %f"), Health);
 
 	//Info to GM if Player died.
-	if (Health <= 0)
+	if ( Health <= 0  )
 	{
 		if (GameModeRef)
 		{

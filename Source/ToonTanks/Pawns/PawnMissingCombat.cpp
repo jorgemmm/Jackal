@@ -16,10 +16,12 @@
 
 #include "ToonTanks/Actors/RescueZone.h"
 
+//Engine
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/World.h"
-
+#include "Engine/EngineTypes.h"
+#include "TimerManager.h"
 #include "DrawDebugHelpers.h"
 
 //#include "Blueprint/AIBlueprintHelperLibrary.h"
@@ -68,9 +70,8 @@ APawnMissingCombat::APawnMissingCombat()
 	ZoneToRescue->OnComponentBeginOverlap.AddDynamic(this, &APawnMissingCombat::OnBOver_Rescue);
 	//ZoneToRescue->OnComponentHit.AddDynamic(this, &APawnMissingCombat::OnHit_Rescue);
 	
-	//GetBaseMesh()->OnComponentHit.AddDynamic(this, &APawnMissingCombat::OnHit_Rescue);	
-	//GetBaseMesh()->OnComponentBeginOverlap.AddDynamic(this, &APawnMissingCombat::NotifyActorEndOverlap);
 
+	
 	
 	
 
@@ -82,8 +83,58 @@ void APawnMissingCombat::BeginPlay()
 	
 	
 	PlayerPawn = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+	
+	FoundMissings(); //Because Timer fires at 10 seconds and must be somethig in  RescueVolumeActors[0]
+	
+					 //Cada 1/2 segundos, a partir de 10 segundos de empezar 
+	GetWorld()->GetTimerManager().ClearTimer(TimerMissingHandler);
 
+	
+	GetWorld()->GetTimerManager().SetTimer(TimerMissingHandler, this, &APawnMissingCombat::MissingDistanceHandler, .5f, true,.5f); 
 }
+
+
+
+void APawnMissingCombat::FoundMissings()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARescueZone::StaticClass(), FoundActors);
+	
+
+	for (auto Actor : FoundActors)
+	{
+		ARescueZone* RescueVolumeActor = Cast<ARescueZone>(Actor);
+		if (RescueVolumeActor)
+		{
+			RescueVolumeActors.AddUnique(RescueVolumeActor);
+			//check(GEngine != nullptr);
+
+			// Display a debug message for five seconds. 
+			// The -1 "Key" value argument prevents the message from being updated or refreshed.
+			/*FString TempMessage = FString::Printf(TEXT("There are new Rescue zone: %s"), *RescueVolumeActor->GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);*/
+
+		}
+	}
+}
+
+void APawnMissingCombat::MissingDistanceHandler()
+{
+	FoundMissings(); //It´s posible there were new spawn missing Drons (PNJ)
+	RescueZoneCloser = false;
+	if (ReturnDistanceToEvacuation() > 0 && ReturnDistanceToEvacuation() <= ReturnDistanceToPlayer())
+	{
+		
+	    //Debug
+		/*
+		UE_LOG(LogTemp, Warning, TEXT("At MissingInAction   Dist min to Extraction: %f"), DistToRescue);
+		UE_LOG(LogTemp, Warning,  TEXT("At APawnMissingCombat::MissingDistanceHandler  Dist PNJ to Extraction: %f"), ReturnDistanceToEvacuation());
+		UE_LOG(LogTemp, Warning,  TEXT("At APawnMissingCombat::MissingDistanceHandler  Dist PNJ to player: %f"), ReturnDistanceToPlayer());
+		*/
+		RescueZoneCloser = true;
+	}
+}
+
 
 
 void APawnMissingCombat::Tick(float DeltaTime)
@@ -98,17 +149,19 @@ void APawnMissingCombat::Tick(float DeltaTime)
 		return;
 	}
 
-	//Debes dcirle al missing in action que si tiene un rescue zon más cerca de 300 
-	//que no persigas al player sino que vayas al cento del rescue zone
+	//If PNJ has an rescue zone closer than player pawn
+	//PNJ move to rescue zone
+	
+	
+	
 
-	UE_LOG(LogTemp, Warning, TEXT("At MissingInAction Tick  Dist min to Extraction: %f"), DistToRescue);
-	UE_LOG(LogTemp, Warning, TEXT("At MissingInAction Tick  Dist current to Extraction: %f"), ReturnDistanceToEvacuation());
-	UE_LOG(LogTemp, Warning, TEXT("At MissingInAction Tick  Dist current to player: %f"), ReturnDistanceToPlayer());
 
-
-	if (ReturnDistanceToEvacuation()>0  &&  ReturnDistanceToEvacuation() <= ReturnDistanceToPlayer() )//1000.f ) //(DistToRescue)) // ReturnDistanceToPlayer())
+	//if (ReturnDistanceToEvacuation()>0  &&  ReturnDistanceToEvacuation() <= ReturnDistanceToPlayer() )
+	// Get From a timer Function -> MissingDistanceHandler() ->  Enable/Disable flag RescueZoneCloser
+	//This  bool change every 1/2 seconds, improve perfomance because we do´t call two for loop every tick 
+	if(RescueZoneCloser) 
 	{
-		//UE_LOG(LogTemp, Error, TEXT("Extraction!!!"))
+		
 		if (RescueVolumeActors.Num() > 0) {
 			
 			FVector Translation = UKismetMathLibrary::GetForwardVector(
@@ -116,7 +169,7 @@ void APawnMissingCombat::Tick(float DeltaTime)
 				)
 			);
 
-			//Estamos moviento la maya padre pero n a los hijos
+			//Estamos moviento la maya padre pero no a los hijos
 			//GetBaseMesh()->AddWorldOffset(Translation);
 			GetCapsule()->AddWorldOffset(Translation);
 
@@ -134,20 +187,21 @@ void APawnMissingCombat::Tick(float DeltaTime)
 	
 
 
-	//UE_LOG(LogTemp, Warning, TEXT("PNJ Move Dist : %f"), ReturnDistanceToPlayer());
 	
-	//Si player está demasiado lejos nos quedamos quietos
+	
+	//if player is Too Far  PNJ Doesn´t Move
 	if (ReturnDistanceToPlayer() > TooFar)
 	{
 		return;
 	}
 
-	//Si player está en zona de rescate no vamos hacia player
+	//if player is in rescue PNJ Doesn´t Move	
 	if (PlayerPawn->GetIsInZoneRescue())
 	{
 		return;
     }
 
+	//But allways Rotate to Player
 	FVector	Translation = UKismetMathLibrary::GetForwardVector(
 		RotateBase(PlayerPawn->GetActorLocation()
 		)
@@ -184,8 +238,9 @@ float APawnMissingCombat::ReturnDistanceToPlayer()
 		return 0.0f;
 	}
 
-	//float Distance = (PlayerPawn->GetActorLocation() - GetActorLocation()).Size();
-	float Distance = (PlayerPawn->GetBaseMesh()->GetComponentLocation() - GetBaseMesh()->GetComponentLocation()).Size();
+	float Distance = (PlayerPawn->GetActorLocation() - GetActorLocation()).Size();
+	UE_LOG(LogTemp, Warning, TEXT("Distance drone to PlayerPawn: %f"), Distance);
+	//float Distance = (PlayerPawn->GetBaseMesh()->GetComponentLocation() - GetBaseMesh()->GetComponentLocation()).Size();
 	return Distance;
 
 
@@ -200,29 +255,42 @@ float APawnMissingCombat::ReturnDistanceToEvacuation()
 		UE_LOG(LogTemp, Error, TEXT("PlayerPawn Not loade or none"));
 		return -1.0f;
 	}
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARescueZone::StaticClass(), FoundActors);
-	//WhereToEvac = 
-
-	for (auto Actor : FoundActors)
-	{
-		ARescueZone* RescueVolumeActor = Cast<ARescueZone>(Actor);
-		if (RescueVolumeActor)
-		{
-			RescueVolumeActors.AddUnique(RescueVolumeActor);
-		}
-	}
-
-	float Distance = 10000.0f;
+	
+	
+	float CurrentDist = 0.f; //(RescueVolumeActors[0]->GetActorLocation() - GetActorLocation()).Size();
+	float Dist_Min_ToClose = 10000.0f;
+	ARescueZone* RescueVolumeNearActor =nullptr;
 	if (RescueVolumeActors.Num() > 0)
 	{
-		Distance = (RescueVolumeActors[0]->GetExtractionShipMesh()->GetComponentLocation() - GetBaseMesh()->GetComponentLocation()).Size();
-	}
 		
-		
-	
+		//if rescue zone near to drone is:
+		for (auto RescueZone: RescueVolumeActors)
+		{
+			CurrentDist = (RescueZone->GetActorLocation() - GetActorLocation()).Size();
 
-	return Distance;
+			if (CurrentDist <= Dist_Min_ToClose)
+			{
+				check(GEngine != nullptr);
+
+				// Display a debug message for five seconds. 
+				// The -1 "Key" value argument prevents the message from being updated or refreshed.			
+				/*FString TempMessage = FString::Printf(TEXT("The Rescue zone: %s , is at: %f from dron"), *RescueZone->GetName(), CurrentDist);
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);*/
+				
+
+				Dist_Min_ToClose = CurrentDist;
+				RescueVolumeNearActor = RescueZone;
+			}
+		
+		}
+
+		CurrentDist = (RescueVolumeNearActor->GetActorLocation() - GetActorLocation()).Size();	
+		
+	  
+	}
+	
+	RescueVolumeActors[0] = RescueVolumeNearActor;
+	return CurrentDist;
 
 }
 
@@ -262,11 +330,7 @@ void APawnMissingCombat::ShowNotCarriedFX()
 			this->GetCapsule()->GetRelativeLocation()  //
 		);
 	}
-		////atta
-		//UGameplayStatics::SpawnEmitterAttached(MissingNotCarriedParticle,
-		//	GetBaseMesh(), )
-		//	
-		//);
+		
 		
 
 
@@ -308,7 +372,7 @@ void APawnMissingCombat::OnBOver_Rescue(UPrimitiveComponent* HitComp, AActor* Ot
 		APawnTank* Player = Cast<APawnTank>(OtherActor);
 		
 		
-
+		//If Player Pawn Is RescueZone -> PNJ Drones doesn´t move and Player Pawn doesnt take any drones  
 		//Si el player está en una zona de rescate ignora a Missing in Actions
 		//no debe Subir al jeep a los drones ( destruir actores) 
 	    // if(	Player -> getISInZoneRescue() ) return;
@@ -327,6 +391,8 @@ void APawnMissingCombat::OnBOver_Rescue(UPrimitiveComponent* HitComp, AActor* Ot
 
 				return;
 			}
+
+			ShowFX();
 
 			UE_LOG(LogTemp, Error, TEXT("PNJ  Actor player missing rescated"));
 			Player->HealingMe(); //Haz una sobrecarga
@@ -369,35 +435,6 @@ void APawnMissingCombat::OnBOver_Rescue(UPrimitiveComponent* HitComp, AActor* Ot
 }
 
 
-void APawnMissingCombat::OnHit_Rescue(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	
-	if (OtherActor && (OtherActor != this))
-	{
-		//UE_LOG(LogTemp, Error, TEXT("Hit ..."));
-
-		/*ARescueZone* RescueZone = Cast<ARescueZone>(OtherActor);
-		UStaticMeshComponent* GetExtractionShipMesh = RescueZone->GetExtractionShipMesh();
-		if(GetExtractionShipMesh)*/
-
-			//UStaticMeshComponent* GetExtractionShipMesh = Cast<RescueZone->GetExtractionShipMesh()>(OtherActor);
-
-		//Destroy();
-	}
-}
-
-void APawnMissingCombat::OnOverlapBegin(AActor * OverlappedActor, AActor * OtherActor)
-{
-	//Not in use
-	if (OtherActor && (OtherActor != this))
-	{
-		//UE_LOG(LogTemp, Error, TEXT("PNJ Move Dist : %f"), ReturnDistanceToPlayer());
-
-
-	}
-}
-
-
 
 
 FRotator APawnMissingCombat::RotateBase(FVector LookAtTarget)
@@ -436,6 +473,9 @@ void APawnMissingCombat::HandleDestruction()
 	// Call base pawn class HandleDestruction to play effects.
 	Super::HandleDestruction();
 	// Hide AI. TODO 
+
+	
+
 	Destroy();
 	//- Create new function to Do this. 
 
@@ -451,7 +491,13 @@ void APawnMissingCombat::NotifyActorEndOverlap(AActor* OtherActor)
 	{
 		if (OtherActor->ActorHasTag("enemy")) return;
 		if (OtherActor->ActorHasTag("boss")) return;
-		ShowFX();
+
+		if(ARescueZone* RescueClosedZone = Cast<ARescueZone>(OtherActor))
+		{
+			ShowFX();
+			HandleDestruction();
+		}
+		
 
 		//Delay
 
@@ -465,12 +511,16 @@ void APawnMissingCombat::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		if (OtherActor->ActorHasTag("enemy")) return;
 		if (OtherActor->ActorHasTag("boss")) return;
-		ShowFX();
+		//ShowFX();
 
 		//Delay
 
 	   //   Destroy();
 	}
 }
+
+
+
+
 
 

@@ -83,7 +83,7 @@ void APawnTurret::CheckFireCondition()
 	//if Player Player  IS in Ranged Then Fire!!
 	if (ReturnDistanceToPlayer() <= FireRange)
 	{
-		// Fire
+		//Fire
 		//UE_LOG(LogTemp, Warning, TEXT("FIRE!!"));
 		Fire();
 	}

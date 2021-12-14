@@ -45,6 +45,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rescue Zone", meta = (AllowPrivateAccess = "true"))
 		TArray<APawnMissingCombat*> MissingInActions;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gulag Settings", meta = (AllowPrivateAccess = "true"))
+		USoundBase* DestructionSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gulag Settings", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<UCameraShake>  DeathShake;
+
 	
 
 private:
@@ -53,7 +59,13 @@ private:
 
 	void SpawnMissing();
 
-	FTimerHandle TimerSpawnHandler;
+	//Change in child class: if turret or tank
+	void HandleDestruction();
+
+	FTimerHandle TimerSpawnHandler, TimerDestroyRescueZone;
+
+	
+
 
 public:	
 
@@ -65,6 +77,7 @@ public:
 	ATankGameModeBase* GameModeRef;
 
 	//Inicio de Maniobra de Extracción
+	/**When Player Arrive Rescue Zone Spawn Drones: Drones get down from jackal*/
 	UFUNCTION()
 	 void OnOverBegin_EvacStart(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
 
@@ -76,14 +89,19 @@ public:
 	UFUNCTION()
 	void OnOverEnd_Player(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
-	UFUNCTION()
-	 void OnCompHit_EvacEnd(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
 
 	/** Return the mesh for the BaseMesh */
 	FORCEINLINE UStaticMeshComponent* GetExtractionShipMesh() const { return ExtractionShipMesh; }
 
 	/**Returns the WhereToSpawn subobject */
 	FORCEINLINE UBoxComponent* GetEvacZone() const { return EvacZone; }
+
+	/** Fire an Event at Blueprint to Active a niagara particle system */
+	UFUNCTION(BlueprintImplementableEvent)
+		void NiagaraStart();
+
+
+
+	
 
 };
