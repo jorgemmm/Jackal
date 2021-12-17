@@ -210,7 +210,7 @@ void ARescueZone::OnOverEnd_Player(class UPrimitiveComponent* OverlappedComp, cl
 		//PlayerPawn->GetCapsule()->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 		
 		
-		UE_LOG(LogTemp, Warning, TEXT("Debug: Player pawn is overlappingEnd rescue none"));
+		//UE_LOG(LogTemp, Warning, TEXT("Debug: Player pawn is overlappingEnd rescue none"));
 		//Update in Player Pawn bIsInZoneRescue = false And Change Collisidon to Block All Dynamic
 		FTimerHandle DelayToPlayerReady;
 

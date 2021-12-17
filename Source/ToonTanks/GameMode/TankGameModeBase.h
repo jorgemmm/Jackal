@@ -62,7 +62,8 @@ private:
 
 
 	
-
+	int32 GetTargetTurretCount();
+	int32 GetMissingCount();
 	void HandleGameStart();
 	void HandleMisionRequired(); //Depecated delete
 	void HandleGameOver(bool PlayerWon);
@@ -114,19 +115,18 @@ public:
 
 	
 	UFUNCTION(BlueprintPure)
-	int32 GetTargetTurretCount() const;
+	int32 GetTargetTurret() const;
+
+	
 
 	UFUNCTION(BlueprintPure)
-	int32 GetMissingInMap() const;
-
-	UFUNCTION(BlueprintPure)
-		int32 GetMaxMissingInMap() const;
+	int32 GetMaxMissingInMap() const;
 
 	UFUNCTION(BlueprintPure)
 	int32 GetScore() const;
 
 	UFUNCTION(BlueprintPure)
-	int32 GetMissingCount() const;
+	int32 GetMissings() const;
 
 	UFUNCTION(BlueprintPure)
 	int32 GetMissingRequired() const;

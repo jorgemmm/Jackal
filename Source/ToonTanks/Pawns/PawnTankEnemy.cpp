@@ -36,7 +36,7 @@ APawnTankEnemy::APawnTankEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 
-	
+	DistTooFar = 25 * DistToShoot;
 
 }
 
@@ -49,28 +49,18 @@ void APawnTankEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*if (!PlayerPawn) {
-		UE_LOG(LogTemp, Error, TEXT("Player Pawn Not Loaded"));
-		return;
-
-	}*/
 	
+	
+	//UE_LOG(LogTemp, Warning, TEXT("Enemy Tank Move Dist : %f"), ReturnDistanceToPlayer()); //Debug
+	//FVector Translation = Velocity * 100 * DeltaTime; //Debug	
 
-	if ( !PlayerPawn || !PlayerPawn->GetPlayerAlive() ) 
-	{
-		UE_LOG(LogTemp, Error, TEXT("No Detecto a al palyerpawn in PawnTurret"));
-		return;
-	}
+	float distToPlayer = ReturnDistanceToPlayer();
 
-	//UE_LOG(LogTemp, Warning, TEXT("Enemy Tank Move Dist : %f"), ReturnDistanceToPlayer());
-
-	if (ReturnDistanceToPlayer() < DistToShoot)
+	if ((distToPlayer < 0)  || distToPlayer > DistTooFar || distToPlayer < DistToShoot)
 	{
 		return;
 	}
 
-	
-	//FVector Translation = Velocity * 100 * DeltaTime;
 	
 	
 	Translation = UKismetMathLibrary::GetForwardVector(
@@ -79,24 +69,24 @@ void APawnTankEnemy::Tick(float DeltaTime)
 		RotateBase(PlayerPawn->GetActorLocation())
 	);
 
-	
-	
+	Move();
 
-	//if  (CheckDistance(PlayerPawn))	
+	return;
+	
+	//below no needed
+	
 	if (ReturnDistanceToPlayer() >= DistToShoot)
 	{		
-		//GetActorLocation() no funciona porque capsule no tiene componente Location
+		//GetActorLocation() no funciona porque capsule  no tiene componente Location
 		//debes coger el basemesh
 		//Lo mismo con player Pawn da problemas en el tick para coger el actor location
 		//UE_LOG(LogTemp, Error, TEXT("Enemy tank go From: %s to:  %s "),*GetBaseMesh()->GetComponentLocation().ToCompactString(), *PlayerPawn->GetBaseMesh()->GetComponentLocation().ToCompactString());
 		//UE_LOG(LogTemp, Error, TEXT("To: %s "),
 		//*PlayerPawn->GetActorLocation().ToString());*/
-		
-		FHitResult Hit;
-		
-			
-		
-		Move();  //AddActorWorldOffset(Translation, true, &Hit);
+		//FHitResult Hit;
+		//AddActorWorldOffset(Translation, true, &Hit);
+
+		Move();
 		 
 		
 		
@@ -106,25 +96,6 @@ void APawnTankEnemy::Tick(float DeltaTime)
 }
 
 
-bool APawnTankEnemy::CheckDistance(APawn* PawnTank)
-{
-	bool GoGoMove = false;
-	
-	if (ReturnDistanceToPlayer() >= DistToShoot)
-	{
-		//Demasiado lejos para disparar => Nos movemos
-		//GetBaseMesh()->AddWorldOffset(Translation);
-		return true;
-	}
-	else
-	{
-		//Distancia de disparo  Paramos
-		return false;
-	}
-	
-	//return GoGoMove;
-
-}
 
 
 
@@ -163,14 +134,20 @@ float APawnTankEnemy::ReturnDistanceToPlayer()
 	if (!PlayerPawn || !PlayerPawn->GetPlayerAlive())
 	{
 		UE_LOG(LogTemp, Error, TEXT("APawnTankEnemy.CPP ReturnDistanceToPlayer PlayerControllerRef is nullptr"));
-		return 0.0f;
+		return -1.f;
 	}
 
 
-	//Distance = (PlayerPawn->GetActorLocation() - GetActorLocation()).Size();
-	//Distance = FVector::DistSquaredXY(PlayerPawn->GetActorLocation(), GetBaseMesh()->GetComponentLocation());
+	 Distance = ( PlayerPawn->GetActorLocation() - GetActorLocation() ).Size();
+	
+	 /*Debug*/
+	 //const FString DistanceHUDFormat = FString::Printf(TEXT("Distance to player %s : %f"), *GetName(), Distance);
+	 //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, DistanceHUDFormat);
+	 //UE_LOG(LogTemp, Warning, TEXT("At APawnTankEnemy::ReturnDistanceToPlayer  Dist Enemy Tank: %s to Player: %f"), *GetName(), Distance);
+     
 
-	Distance = (PlayerPawn->GetBaseMesh()->GetComponentLocation() - GetBaseMesh()->GetComponentLocation()).Size();
+	//Distance = FVector::DistSquaredXY(PlayerPawn->GetActorLocation(), GetBaseMesh()->GetComponentLocation());
+	//Distance = (PlayerPawn->GetBaseMesh()->GetComponentLocation() - GetBaseMesh()->GetComponentLocation()).Size();
 
 	return Distance;
 

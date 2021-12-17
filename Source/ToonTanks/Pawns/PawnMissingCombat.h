@@ -53,11 +53,14 @@ private:
 
 	APawnTank* PlayerPawn;
 
+	void Move();
 
 	float ReturnDistanceToPlayer();
 
 
 	float ReturnDistanceToEvacuation();
+
+	
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Missing", meta = (AllowPrivateAccess = "true"))
@@ -78,7 +81,7 @@ private:
 	void FoundMissings();
 
 	void MissingDistanceHandler();
-
+	/**This  bool change every 1/2 seconds, improve perfomance because we do´t call two for loop every tick*/
 	bool RescueZoneCloser = false;
 
 

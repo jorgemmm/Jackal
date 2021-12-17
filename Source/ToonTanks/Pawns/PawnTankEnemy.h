@@ -33,13 +33,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	bool CheckDistance(APawn* PawnTank);
+	
 
 	//Change in child class: if enemy tank
 	virtual void HandleDestruction() override;
 
 	//Change override in child class: if enemy tank
 	virtual float ReturnDistanceToPlayer() override;
+
+
 
 private:
 
@@ -54,6 +56,10 @@ private:
 	/**Distance To stop and ready to shot: when target is at FireRange*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 		float DistToShoot = 1000.0f;
+
+	/**Distance To stop and ready to shot: when target is at FireRange*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float DistTooFar; //{ DistToShoot * 1000 };
 
 protected:
 	

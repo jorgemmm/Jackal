@@ -113,6 +113,7 @@ void APawnMissingCombat::FoundMissings()
 			// The -1 "Key" value argument prevents the message from being updated or refreshed.
 			/*FString TempMessage = FString::Printf(TEXT("There are new Rescue zone: %s"), *RescueVolumeActor->GetName());
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TempMessage);*/
+			
 
 		}
 	}
@@ -121,10 +122,13 @@ void APawnMissingCombat::FoundMissings()
 void APawnMissingCombat::MissingDistanceHandler()
 {
 	FoundMissings(); //It´s posible there were new spawn missing Drons (PNJ)
+	
 	RescueZoneCloser = false;
-	if (ReturnDistanceToEvacuation() > 0 && ReturnDistanceToEvacuation() <= ReturnDistanceToPlayer())
+	
+	float DistEvacZone = ReturnDistanceToEvacuation();	
+	
+	if (DistEvacZone > 0 && DistEvacZone <= ReturnDistanceToPlayer())
 	{
-		
 	    //Debug
 		/*
 		UE_LOG(LogTemp, Warning, TEXT("At MissingInAction   Dist min to Extraction: %f"), DistToRescue);
@@ -132,6 +136,7 @@ void APawnMissingCombat::MissingDistanceHandler()
 		UE_LOG(LogTemp, Warning,  TEXT("At APawnMissingCombat::MissingDistanceHandler  Dist PNJ to player: %f"), ReturnDistanceToPlayer());
 		*/
 		RescueZoneCloser = true;
+
 	}
 }
 
@@ -140,30 +145,57 @@ void APawnMissingCombat::MissingDistanceHandler()
 void APawnMissingCombat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	
-
-
-	if (!PlayerPawn || !PlayerPawn->GetPlayerAlive())
-	{
-		return;
-	}
 
 	//If PNJ has an rescue zone closer than player pawn
 	//PNJ move to rescue zone
 	
 	
+	float distToPlayer = ReturnDistanceToPlayer();
+	//if player is Too Far  PNJ Doesn´t Move
+	// or if player is in rescue PNJ Doesn´t Move
+
+	if (distToPlayer<0 || distToPlayer<= DistToRescue || distToPlayer > TooFar || PlayerPawn->GetIsInZoneRescue())
+	{
+		return;
+	}
+
+		
+	
 	
 
+	
 
-	//if (ReturnDistanceToEvacuation()>0  &&  ReturnDistanceToEvacuation() <= ReturnDistanceToPlayer() )
-	// Get From a timer Function -> MissingDistanceHandler() ->  Enable/Disable flag RescueZoneCloser
-	//This  bool change every 1/2 seconds, improve perfomance because we do´t call two for loop every tick 
-	if(RescueZoneCloser) 
-	{
+	Move();
+
+	
+	
+	//FVector Translation = Velocity * 100 * DeltaTime;	
+
+	
+	
+	
+		//Near the player
+		//UE_LOG(LogTemp, Error, TEXT("PNJ Pawn tank Move from: %s   to: %s "),*GetActorLocation().ToCompactString(),	*PlayerPawn->GetActorLocation().ToCompactString());
+		//GetBaseMesh()->AddWorldOffset(Translation);
+		//GetCapsule()->AddWorldOffset(Translation);
+
 		
+	
+	
+
+}
+
+void APawnMissingCombat::Move()
+{
+	   //if (ReturnDistanceToEvacuation()>0  &&  ReturnDistanceToEvacuation() <= ReturnDistanceToPlayer() )
+	   // Get From a timer Function -> MissingDistanceHandler() ->  Enable/Disable flag RescueZoneCloser
+	   //This  bool change every 1/2 seconds, improve perfomance because we do´t call two for loop every tick 
+	if (RescueZoneCloser)
+	{
+
 		if (RescueVolumeActors.Num() > 0) {
-			
+
 			FVector Translation = UKismetMathLibrary::GetForwardVector(
 				RotateBase(RescueVolumeActors[0]->GetActorLocation()
 				)
@@ -180,52 +212,19 @@ void APawnMissingCombat::Tick(float DeltaTime)
 			UE_LOG(LogTemp, Error, TEXT("At MissingInAction Tick  RescueVolumeActors is not Founded or is nullptr"));
 		}
 
-		return;
+		
+
 	}
-	
-	
-	
-
-
-	
-	
-	//if player is Too Far  PNJ Doesn´t Move
-	if (ReturnDistanceToPlayer() > TooFar)
+	else
 	{
-		return;
+		//But allways Rotate to Player
+		FVector	Translation = UKismetMathLibrary::GetForwardVector(
+			RotateBase(PlayerPawn->GetActorLocation()
+			)
+		);
+		AddActorWorldOffset(Translation, true);
 	}
-
-	//if player is in rescue PNJ Doesn´t Move	
-	if (PlayerPawn->GetIsInZoneRescue())
-	{
-		return;
-    }
-
-	//But allways Rotate to Player
-	FVector	Translation = UKismetMathLibrary::GetForwardVector(
-		RotateBase(PlayerPawn->GetActorLocation()
-		)
-	);	
-	
-	//FVector Translation = Velocity * 100 * DeltaTime;	
-
-	
-	
-		if (ReturnDistanceToPlayer() >= DistToRescue)
-		{
-			//Near the player
-			//UE_LOG(LogTemp, Error, TEXT("PNJ Pawn tank Move from: %s   to: %s "),*GetActorLocation().ToCompactString(),	*PlayerPawn->GetActorLocation().ToCompactString());
-			//GetBaseMesh()->AddWorldOffset(Translation);
-			//GetCapsule()->AddWorldOffset(Translation);
-
-			AddActorWorldOffset(Translation, true);
-		}
-	
-	
-
 }
-
-
 
 float APawnMissingCombat::ReturnDistanceToPlayer()
 {
@@ -234,13 +233,16 @@ float APawnMissingCombat::ReturnDistanceToPlayer()
 	
 	if (!PlayerPawn || !PlayerPawn->GetPlayerAlive())
 	{
-		UE_LOG(LogTemp, Error, TEXT("PlayerPawn Not loade or none"));
-		return 0.0f;
+		UE_LOG(LogTemp, Error, TEXT("PlayerPawn Not loaded or none"));
+		return -1.f;
 	}
 
 	float Distance = (PlayerPawn->GetActorLocation() - GetActorLocation()).Size();
-	UE_LOG(LogTemp, Warning, TEXT("Distance drone to PlayerPawn: %f"), Distance);
+	
+	//UE_LOG(LogTemp, Warning, TEXT("Distance drone to PlayerPawn: %f"), Distance);
 	//float Distance = (PlayerPawn->GetBaseMesh()->GetComponentLocation() - GetBaseMesh()->GetComponentLocation()).Size();
+	
+	
 	return Distance;
 
 
@@ -270,8 +272,7 @@ float APawnMissingCombat::ReturnDistanceToEvacuation()
 
 			if (CurrentDist <= Dist_Min_ToClose)
 			{
-				check(GEngine != nullptr);
-
+				//check(GEngine != nullptr);
 				// Display a debug message for five seconds. 
 				// The -1 "Key" value argument prevents the message from being updated or refreshed.			
 				/*FString TempMessage = FString::Printf(TEXT("The Rescue zone: %s , is at: %f from dron"), *RescueZone->GetName(), CurrentDist);
@@ -280,6 +281,7 @@ float APawnMissingCombat::ReturnDistanceToEvacuation()
 
 				Dist_Min_ToClose = CurrentDist;
 				RescueVolumeNearActor = RescueZone;
+
 			}
 		
 		}

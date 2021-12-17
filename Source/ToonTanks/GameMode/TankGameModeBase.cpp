@@ -3,15 +3,20 @@
 
 #include "TankGameModeBase.h"
 
+//Project
+#include "ToonTanks/Pawns/PawnTank.h"
+#include "ToonTanks/Pawns/PawnTurret.h"
+#include "ToonTanks/Pawns/PawnMissingCombat.h"
+#include "ToonTanks/Pawns/PawnTankEnemy.h"
+
 //Engine
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
 
 //Components
 #include "Toontanks/GameInstance/TankGameGameInstance.h"
-#include "ToonTanks/Pawns/PawnTank.h"
-#include "ToonTanks/Pawns/PawnTurret.h"
-#include "ToonTanks/Pawns/PawnMissingCombat.h"
+
+
 
 #include "ToonTanks/Actors/TargetSpawn.h"
 #include "ToonTanks/Actors/GulagZone.h"
@@ -24,6 +29,7 @@
 
 //Utils
 #include "Kismet/GameplayStatics.h"
+#include "Math/Vector.h"
 #include "TimerManager.h"
 
 #define OUT
@@ -147,8 +153,8 @@ void ATankGameModeBase::HandleMision()
 {
 	const int32 EnemyDestroyed = TargetTurrets;
 	const int32 Dronesrescue = MissinInActions;//MissingInAcRequiredByLevel[LevelID];
-	UE_LOG(LogTemp, Error, TEXT("A EnemyPawn Died, Left: %d"), EnemyDestroyed);
-	UE_LOG(LogTemp, Error, TEXT("A Dr0ne rescued: %d, Missings : %d"),Dronesrescue, MissingRequired);
+	//UE_LOG(LogTemp, Warning, TEXT("A EnemyPawn Died, Left: %d"), EnemyDestroyed);
+	//UE_LOG(LogTemp, Warning, TEXT("A Dr0ne rescued: %d, Missings : %d"),Dronesrescue, MissingRequired);
 	if (EnemyDestroyed == 0 && Dronesrescue >= MissingRequired)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Mission acomplished"));
@@ -174,7 +180,7 @@ int32 ATankGameModeBase::GetSpawnPointId() const
 void ATankGameModeBase::SetMissingRequired()
 {
 	//MissingRequired = GetMissingRequired();
-	const int32 CurrentDrones = FMath::Clamp(GetMissingInMap(), 0, GetMissingInMap());
+	const int32 CurrentDrones = FMath::Clamp(GetMissingCount(), 0, GetMaxMissingInMap());
 
 	MissingRequired += CurrentDrones;
 
@@ -182,7 +188,7 @@ void ATankGameModeBase::SetMissingRequired()
 }
 
 
-int32 ATankGameModeBase::GetMissingCount() const
+int32 ATankGameModeBase::GetMissings() const
 {
 
 	//To update in Widget BP the drones rescued
@@ -191,26 +197,33 @@ int32 ATankGameModeBase::GetMissingCount() const
 }
 
 
-int32 ATankGameModeBase::GetTargetTurretCount() const
+int32 ATankGameModeBase::GetTargetTurretCount()
 {
 	// Get references and game win/lose conditions.
+
+	
+
 	TSubclassOf<APawnTurret> ClassToFind;
 	ClassToFind = APawnTurret::StaticClass();
 	
 	TArray<AActor*> TurretActors;
 	
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ClassToFind, OUT TurretActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ClassToFind, OUT TurretActors);	
 	
 	return TurretActors.Num();
 
 }
 
+int32 ATankGameModeBase::GetTargetTurret() const
+{
+	return TargetTurrets;
+}
+
 
 int32 ATankGameModeBase::GetMissingRequired() const
 {
-
+	//When MissinInActions==MissingRequired the mission is success
 	//Get references and game win/lose conditions.	
-
 	//return MissingInAcRequiredByLevel[LevelID];
 	return MissingRequired;
 }
@@ -222,7 +235,7 @@ int32 ATankGameModeBase::GetMissingRequired() const
 	place some drones in map to avoid nulptr reference*/
 
 
-int32 ATankGameModeBase::GetMissingInMap() const
+int32 ATankGameModeBase::GetMissingCount()
 {
 	
 	
@@ -236,6 +249,8 @@ int32 ATankGameModeBase::GetMissingInMap() const
 
 	return MissingActors.Num();
 }
+
+
 
 int32 ATankGameModeBase::GetMaxMissingInMap() const
 {
@@ -254,7 +269,7 @@ void ATankGameModeBase::HandleGameStart()
 	TargetTurrets = GetTargetTurretCount();
 	MissinInActions = 0;
 	//place some drones in map to avoid nulptr reference
-	MissingRequired = GetMissingInMap();
+	MissingRequired = GetMissingCount();
 
 	
 	PlayerTank = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
@@ -468,7 +483,7 @@ void ATankGameModeBase::HandleMisionRequired()
 		//MissingRequired = 0;
 		HandleGameOver(true);
 	}
-	else
+	/*else
 	{
 
 		UE_LOG(LogTemp, Warning, TEXT("Enemies Left: %f"), TargetTurrets);
@@ -476,7 +491,7 @@ void ATankGameModeBase::HandleMisionRequired()
 		UE_LOG(LogTemp, Warning, TEXT("Misssing Rescued  Left: %i"), (MissinInActions));
 
 
-	}
+	}*/
 }
 
 
@@ -524,8 +539,8 @@ void ATankGameModeBase::ReSpawn()
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = GetInstigator();
 
-		FVector loc = FVector::FVector(0, 0, 112);
-		FTransform Transform = FTransform::FTransform(loc);
+		FVector loc = FVector(0, 0, 112);
+		FTransform Transform = FTransform(loc);
 		FoundActors[SpawnPointId]->GetTransform();
 
 		PlayerTank = World->SpawnActor<APawnTank>(HeroTankClass, Transform, SpawnParams);
