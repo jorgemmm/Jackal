@@ -79,3 +79,9 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Maps never compile
+Maps/Level1
+Maps/Level2
+Maps/Level4
+Maps/Level5

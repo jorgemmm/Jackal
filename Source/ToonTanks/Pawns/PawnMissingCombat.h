@@ -78,7 +78,7 @@ private:
 
 	FTimerHandle TimerMissingHandler;
 
-	void FoundMissings();
+	void FoundRescueZones();
 
 	void MissingDistanceHandler();
 	/**This  bool change every 1/2 seconds, improve perfomance because we do´t call two for loop every tick*/

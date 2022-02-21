@@ -31,6 +31,7 @@
 #include "Particles/ParticleSystem.h"
 
 #include "Components/AudioComponent.h"
+#include "DrawDebugHelpers.h"
 
 
 APawnTank::APawnTank()
@@ -98,8 +99,8 @@ void APawnTank::Tick(float DeltaTime)
 	}
 		
 
-	Rotate();
-	Move();
+	//Rotate();
+	//Move();
 
 
 	TArray<TEnumAsByte<EObjectTypeQuery> > ObjectTypes;
@@ -119,41 +120,53 @@ void APawnTank::Tick(float DeltaTime)
 		return;
 	}*/
 	
-	FHitResult Hit, FingerHit;
-	PlayerControllerRef->GetHitResultUnderCursorForObjects(ObjectTypes, true, Hit);
+
+	/*FHitResult Hit, FingerHit, FingerObjHit;
+	PlayerControllerRef->GetHitResultUnderCursorForObjects(ObjectTypes, true, Hit);*/
 	
+
+
 	//ETouchIndex::Type FingerIndex::Touch3;
-	//ECollisionChannel TraceChannel;
-
+	//CollisionChannel TraceChannel;
+	//
 	//For Mobile
-	PlayerControllerRef->GetHitResultUnderFinger(ETouchIndex::Type::Touch3, ECC_Visibility,true, FingerHit);
-
+	//PlayerControllerRef->GetHitResultUnderFinger(
+	//	ETouchIndex::Type::Touch1, //Type::Touc3
+	//	ECC_Visibility
+	//	,true, 
+	//	FingerHit
+	//);
+	//
+	/*PlayerControllerRef->GetHitResultUnderFingerForObjects(
+		ETouchIndex::Type::Touch3,
+		ObjectTypes,
+		true,
+		FingerObjHit
+	);*/
+	//
 	//PlayerControllerRef->GetHitResultUnderFinger(ETouchIndex::Type::Touch3, ECC_Visibility, true, FingerHit);
-	if (Hit.bBlockingHit || FingerHit.bBlockingHit)
-	{
-		//RotateTurret(FingerHit.ImpactPoint);
-		if (Hit.bBlockingHit) { RotateTurret(Hit.ImpactPoint); LastLocation =Hit.ImpactPoint;}
-		if (FingerHit.bBlockingHit) { RotateTurret(FingerHit.ImpactPoint); LastLocation = FingerHit.ImpactPoint;}		
-	}
-	else
-	{
-		
-		//RotateTurret(GetActorForwardVector());
-		RotateTurret(LastLocation);
-	}
+	//if (Hit.bBlockingHit 
+	//	//|| FingerHit.bBlockingHit 
+	//	|| FingerObjHit.bBlockingHit)
+	//{
+	//
+	//	DrawDebugSphere(GetWorld(), FingerObjHit.ImpactPoint, 100.f, 12, FColor::Red, true, 30.f);
+	//	//RotateTurret(FingerHit.ImpactPoint);
+	//	if (Hit.bBlockingHit) { RotateTurret(Hit.ImpactPoint); LastLocation =Hit.ImpactPoint;}
+	//	//if (FingerHit.bBlockingHit) { RotateTurret(FingerHit.ImpactPoint); LastLocation = FingerHit.ImpactPoint;}		
+	//	if (FingerObjHit.bBlockingHit) { RotateTurret(FingerObjHit.ImpactPoint); LastLocation = FingerObjHit.ImpactPoint; }
+	//}
+	//else
+	//{
+	//	
+	//	//RotateTurret(GetActorForwardVector());
+	//	RotateTurret(LastLocation);
+	//}
 	
 	
 
 }
 
-
-//Deprec
-void APawnTank::GetYawTurretRotate(float DeltaTime)
-{
-	//TurretCurrentYaw = GetTurretMesh()->GetComponentRotation().Yaw;
-
-
-}
 
 
 
@@ -164,9 +177,13 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 
 	
-	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);
-	PlayerInputComponent->BindAxis("TurnRight", this, &APawnTank::CalculateRotateInput);
-	
+	/*PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);
+	PlayerInputComponent->BindAxis("TurnRight", this, &APawnTank::CalculateRotateInput);*/
+
+	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::Move);
+	PlayerInputComponent->BindAxis("TurnRight", this, &APawnTank::Rotate);
+
+
 	//Mirar gomvo`para configurar en opciones distintas entradas.
 	/*if (bIsTwinSticShooter)
 	{
@@ -181,7 +198,8 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	
 	
 	
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);	
+	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::AimFire);
+	PlayerInputComponent->BindAction("AimFire", IE_Pressed, this, &APawnTank::AimFire);
 	//PlayerInputComponent->BindAction("Turbo", IE_Pressed, &APawnTank::Turbo);
 
 }
@@ -209,14 +227,19 @@ void APawnTank::SetPlayerReAlive()
 
 
 
-void APawnTank::CalculateMoveInput(float Value)
+void APawnTank::CalculateMoveInput(float value)
 {
-	MoveDirection = FVector(Value * MoveSpeed * GetWorld()->DeltaTimeSeconds, 0, 0);
+	
+	MoveDirection = FVector(value * MoveSpeed * GetWorld()->DeltaTimeSeconds, 0, 0);
+
+
+	
+
 }
 
-void APawnTank::CalculateRotateInput(float Value)
+void APawnTank::CalculateRotateInput(float value)
 {
-	float RotateAmount = Value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
+	float RotateAmount = value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
 	
 	FRotator Rotation = FRotator(0, RotateAmount, 0);
 	
@@ -226,32 +249,35 @@ void APawnTank::CalculateRotateInput(float Value)
 
 }
 
-void APawnTank::Move()
+void APawnTank::Move(float value)
 {
-	FHitResult Hit;
-	
-	//GetCapsule()->AddLocalOffset(MoveDirection, true, &Hit);
-	AddActorLocalOffset(MoveDirection,true, &Hit);
-	//AddActorWorldOffset(MoveDirection, true);
-	
-	if (Hit.IsValidBlockingHit())
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Algo ha bloqueado al PawnTank"));
-		MoveDirection = FVector::ZeroVector;
+	//if move with input
+	CalculateMoveInput(value);
+
+	AddActorLocalOffset(MoveDirection, true);
+
+	//return;
+
+	//FHitResult Hit;	
+	//if (Hit.IsValidBlockingHit())
+	//{
+		//UE_LOG(LogTemp, Error, TEXT("Algo ha bloqueado al PawnTank"));
+		//MoveDirection = FVector::ZeroVector;
 		//UE_LOG(LogTemp, Warning, TEXT("MoveDirection: %f "), MoveDirection.Size());
-	}
-	else
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Nada Bloquea al PawnTank"));
-	}
-	
+	//}	
+	//GetCapsule()->AddLocalOffset(MoveDirection, true, &Hit);
+	//AddActorWorldOffset(MoveDirection, true);
+	//AddActorLocalOffset(MoveDirection, true, &Hit);
 	
 }
 
-void APawnTank::Rotate()
+void APawnTank::Rotate(float value)
 {
+	CalculateRotateInput(value);
+
 	//GetCapsule()->AddLocalRotation(RotationDirection, true);
 	AddActorLocalRotation(RotRotationDirection, true);	
+	
 	//AddActorLocalRotation(QuatRotationDirection, true); //Like course
 	
 }
@@ -279,7 +305,58 @@ void APawnTank::CoolDown()
 
 
 
+void APawnTank::AimFire()
+{
+	if (!PlayerControllerRef)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PawnTank.CPP tick PlayerControllerRef is nullptr"));
+		return;
+	}
+	/*TArray<TEnumAsByte<EObjectTypeQuery> > ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldStatic));*/
+	FHitResult Hit;
+	//PlayerControllerRef->GetHitResultUnderCursorForObjects(ObjectTypes, true, Hit);
+	//PlayerControllerRef->GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+	//if(Hit.bBlockingHit)
+	//{
+	//	//DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 100.f, 12, FColor::Green, true, 30.f);
+	//	RotateTurret(Hit.ImpactPoint);
+	//	LastLocation = Hit.ImpactPoint;
 
+	//	Fire();
+	//	return;
+	//}
+
+	FHitResult FingerHit;
+	PlayerControllerRef->GetHitResultUnderFinger(
+		ETouchIndex::Type::Touch1, 
+		ECC_Visibility
+		,true, FingerHit
+	);
+
+	if ( FingerHit.bBlockingHit )
+	{
+		//DrawDebugSphere(GetWorld(), FingerHit.ImpactPoint, 100.f, 12, FColor::Red, true, 30.f);
+		
+		
+			
+		RotateTurret(FingerHit.ImpactPoint);
+		LastLocation = FingerHit.ImpactPoint;
+				
+		Fire();
+		//return;
+	
+	}
+
+	
+	
+	if (LastLocation != FVector::ZeroVector)
+		RotateTurret(LastLocation);
+	else
+		RotateTurret(GetActorForwardVector());
+	
+}
 
 void APawnTank::Fire()
 {
@@ -417,7 +494,10 @@ bool APawnTank::GetIsInZoneRescue() const
 	return bIsInZoneRescue;
 }
 
-
+FRotator APawnTank::GetRotRotationDirection() const
+{
+	return RotRotationDirection;
+}
 
 float APawnTank::GetTemperatura() const
 {
@@ -494,6 +574,18 @@ void APawnTank::SetPanther(bool newValue)
 {
 	bisPantherTank = newValue;
 }
+
+
+
+
+//Deprec
+//void APawnTank::GetYawTurretRotate(float DeltaTime)
+//{
+//	//TurretCurrentYaw = GetTurretMesh()->GetComponentRotation().Yaw;
+//
+//
+//}
+
 
 
 

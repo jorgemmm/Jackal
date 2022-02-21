@@ -11,5 +11,12 @@ public class ToonTanksTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 
 		ExtraModuleNames.AddRange( new string[] { "ToonTanks" } );
+
+		if (Target.Platform == UnrealTargetPlatform.Android)
+		{
+			ExtraModuleNames.Add("OnlineSubsystemGooglePlay");
+			ExtraModuleNames.Add("OnlineSubsystem");
+			ExtraModuleNames.Add("AndroidAdvertising");
+		}
 	}
 }

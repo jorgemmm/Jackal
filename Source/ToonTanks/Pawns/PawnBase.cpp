@@ -43,7 +43,7 @@
 APawnBase::APawnBase()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	/*DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
 	RootComponent = DefaultSceneRoot;*/
@@ -81,7 +81,7 @@ void APawnBase::BeginPlay()
 void APawnBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+	//PrimaryActorTick.bCanEverTick = false;
 
 }
 

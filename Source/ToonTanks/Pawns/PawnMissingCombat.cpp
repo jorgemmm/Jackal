@@ -84,7 +84,7 @@ void APawnMissingCombat::BeginPlay()
 	
 	PlayerPawn = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
 	
-	FoundMissings(); //Because Timer fires at 10 seconds and must be somethig in  RescueVolumeActors[0]
+	FoundRescueZones(); //Because Timer fires at 10 seconds and must be somethig in  RescueVolumeActors[0]
 	
 					 //Cada 1/2 segundos, a partir de 10 segundos de empezar 
 	GetWorld()->GetTimerManager().ClearTimer(TimerMissingHandler);
@@ -95,7 +95,7 @@ void APawnMissingCombat::BeginPlay()
 
 
 
-void APawnMissingCombat::FoundMissings()
+void APawnMissingCombat::FoundRescueZones()
 {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARescueZone::StaticClass(), FoundActors);
@@ -121,7 +121,7 @@ void APawnMissingCombat::FoundMissings()
 
 void APawnMissingCombat::MissingDistanceHandler()
 {
-	FoundMissings(); //It´s posible there were new spawn missing Drons (PNJ)
+	FoundRescueZones(); //It´s posible there were new spawn missing Drons (PNJ)
 	
 	RescueZoneCloser = false;
 	
@@ -285,13 +285,21 @@ float APawnMissingCombat::ReturnDistanceToEvacuation()
 			}
 		
 		}
-
-		CurrentDist = (RescueVolumeNearActor->GetActorLocation() - GetActorLocation()).Size();	
-		
+		if (RescueVolumeNearActor != nullptr) 
+		{
+			CurrentDist = (RescueVolumeNearActor->GetActorLocation() - GetActorLocation()).Size();
+			RescueVolumeActors[0] = RescueVolumeNearActor; // no in use.
+		}
+		else
+		{
+			//No enough closed to rescu zone, return 1.2 * 10000 always
+			CurrentDist = 1.2f * Dist_Min_ToClose; 
+		}
+			
 	  
 	}
 	
-	RescueVolumeActors[0] = RescueVolumeNearActor;
+
 	return CurrentDist;
 
 }

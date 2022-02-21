@@ -355,9 +355,16 @@ void ATankGameModeBase::HandleGameOver(bool PlayerWon)
 		
 		
 		//TankGI->UpdateLevelID();		
+		
+		/*** 
+		* 
+		***Versión Demo *** En versión Completa Descomentar y poner más niveles
+		
 		TankGI->UpdateLevelID(LevelID+1);
 
-		
+
+		***Versión Demo ***
+		***/
 		LevelID = TankGI->GetLevelID();	
 		
 		//Para recibir feedback en itch.io or discord

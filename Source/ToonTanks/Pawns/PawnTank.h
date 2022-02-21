@@ -105,10 +105,13 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MissingInAction", meta = (AllowPrivateAccess = "true"))
 		int32 MaxPassenger=10;
 
+	//UPROPERTY()
 	FVector MoveDirection, LastLocation;
-
+	
+	//UPROPERTY()
 	FRotator RotRotationDirection;
 	
+	//UPROPERTY()
 	FQuat QuatRotationDirection; //Like course 
 
 	APlayerController* PlayerControllerRef;
@@ -125,8 +128,12 @@ private:
 	void CalculateMoveInput(float Value);
 	void CalculateRotateInput(float Value);
 
-	void Move();
-	void Rotate();
+	/*void Move();
+	void Rotate();*/
+	void Move(float value);
+	void Rotate(float value);
+
+	void AimFire();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hero Settings", meta = (AllowPrivateAccess = "true"))
 	float Temperatura;
@@ -174,7 +181,7 @@ private:
 
 protected:
 	
-	void GetYawTurretRotate(float DeltaTime); //Dpreca
+	//void GetYawTurretRotate(float DeltaTime); //Dpreca
 	
 	float TurretCurrentYaw; //Deprec
 	
@@ -202,6 +209,8 @@ public:
 	UFUNCTION(BlueprintPure)
 		float GetTemperatura() const;
 
+	UFUNCTION(BlueprintPure)
+		FRotator GetRotRotationDirection() const;
 	/*UFUNCTION(BlueprintCallable)
 		void ResetTemperature();*/
 
@@ -230,5 +239,11 @@ public:
 	/*Establece si tenemos ya un Panther*/
 	UFUNCTION(BlueprintCallable)
 		void SetPanther(bool newValue);
+
+
+	//delete
+protected:
+
+	//void GetYawTurretRotate(float DeltaTime); //Dpreca
 
 };
