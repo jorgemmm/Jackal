@@ -65,12 +65,6 @@ void AGulagZone::BeginPlay()
 	
 }
 
-/* Called every frame*/
-//void AGulagZone::Tick(float DeltaTime)
-//{
-//	Super::Tick(DeltaTime);
-//
-//}
 
 void AGulagZone::GulagZoneDestroyed()
 {
@@ -78,23 +72,16 @@ void AGulagZone::GulagZoneDestroyed()
 }
 
 void AGulagZone::HandleDestruction()
-{
-
-	//Evento para disparar el niagara en bluemprint
-	//UGameplayStatics::SpawnEmitterAtLocation(this, DeathParticle, GetActorLocation());
+{	
 
 	const int32 DronesUnleash = FMath::RandRange(2, 5);
 	for (size_t i = 0; i < DronesUnleash; i++)
 	{
 		SpawnMissing();
-	}
-	
+	}	
 
 	NiagaraStart();
-
 	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
-
-	
 
 	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(DeathShake);
 
@@ -116,37 +103,24 @@ void AGulagZone::SpawnMissing()
 	SpawnParams.Instigator = GetInstigator();
 
 	
-
+        //Spawn in random Loc and Rot
 	const float x = FMath::RandRange(-4.f * DroneDispersion, 4.f * DroneDispersion);
 	const float y = FMath::RandRange(-4.f * DroneDispersion, 4.f* DroneDispersion);
-
-
-
 	const FVector  PawnMissingSpawnLocation = GetWallMesh()->GetComponentLocation() + FVector(x, y, 100.f);
 	const FRotator PawnMissingSpawnRotator = GetWallMesh()->GetComponentRotation() + FRotator(0.f, 0.f, (x + y) / 10);;
-	//PawnMissingSpawnLocation += FVector(x, y, 100.f);
-	//PawnMissingSpawnLocation += FVector(200.f, 200.f, 100.f);
-	//PawnMissingSpawnRotator += FRotator(x / 2, y / 2, 0.f);
-
-
-
+	
 	APawnMissingCombat* PawnMissed = GetWorld()->SpawnActor<APawnMissingCombat>(
 		MissingInActionClass,
 		PawnMissingSpawnLocation,
 		PawnMissingSpawnRotator
 		, SpawnParams
 		);
-
-
-	//MissingInActions.EmplaceAt(i, PawnMissed);
+	
 	if (!PawnMissed)
-	{
-		//Informa de error de Spawnes
+	{		
 		UE_LOG(LogTemp, Error, TEXT("At RescueZone::SpawnMissing  PawnMissed is not Spawned or is nullptr"));
 		return;
 	}
-
-
 
 	MissingInActions.Emplace(PawnMissed);
 
