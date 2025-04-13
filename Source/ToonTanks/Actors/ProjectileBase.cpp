@@ -17,7 +17,7 @@
 
 #include "DrawDebugHelpers.h"
 
-
+//"debug code" for console command
 //int32 DebugWeaponDrawing = 0;
 //FAutoConsoleVariableRef   CVARDebugWeaponDrawing(
 //	TEXT("ToonTanks.DebugProjectile"),
@@ -53,41 +53,34 @@ AProjectileBase::AProjectileBase()
 // Called when the game starts or when spawned
 void AProjectileBase::BeginPlay()
 {
-	Super::BeginPlay();
-
-	
-	
+	Super::BeginPlay();	
 	UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());
-
 }
 
 void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Try to get a reference to the owning class. 
 	AActor* MyOwner = GetOwner();
-
-	// If for some reason we can't get a valid reference, return as we need to check against the owner. 
 	if (!MyOwner)
 	{
+		UE_LOG(Logtemp, Error, TEXT("Owner not found or is nulptr"));
 		return;
 	}
 
 
 	PointDamage =  BaseDamage;
 	RadialDamage = BaseDamage / 4;
-
-
-	// If the OtherActors isn't self or owner && exists, then apply damage.
-	//And Particle system
-	TArray<AActor*> IgnorethisActors;// [] = { this , MyOwner };
+	
+	TArray<AActor*> IgnorethisActors;
 	IgnorethisActors.AddUnique(this);
 	IgnorethisActors.AddUnique(MyOwner);
 
+	//Apply damage to other actor
 	if (OtherActor != NULL && OtherActor != this && OtherActor != MyOwner)
 	{
-
+    
 		UE_LOG(LogTemp, Warning, TEXT("FIRE!! PointDamage: %f"), PointDamage);
-		//Damage
+		
 
 		UGameplayStatics::ApplyDamage(
 			OtherActor,
@@ -99,6 +92,7 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 
 		UE_LOG(LogTemp, Warning, TEXT("FIRE!! RadialDamage: %f to %s"), RadialDamage, *OtherActor->GetName());
+		
 		UGameplayStatics::ApplyRadialDamage(
 			OtherActor,
 			RadialDamage,
@@ -112,12 +106,16 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 		);
 
+		//Uncoment this if you have uncoment the "debug code" for console command
 		//if (DebugWeaponDrawing > 0)
 		{
 
 			//DrawDebugSphere(GetWorld(), Hit.ImpactPoint, RadialRange, 8.f, FColor::Yellow, false, 3.0f, 0, 1.0f);
 		}
-		
+
+		//You can add force to projectil 
+		//Projectil must  have collision reaady to hit to target
+		//and target must have physhic enable. 
 		//ProjectileMesh->AddForce(this->GetVelocity() * 100);
 
 		// Particle System
